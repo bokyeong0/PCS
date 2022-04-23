@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="주문배송메모리스트" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9f7d3460-12f3-456a-94c9-f8c62b23d853">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="dataset1" uuid="3594190c-0a1d-4e87-aa8f-1666a132df89"/>
+	<parameter name="short_order_no" class="java.lang.String">
+		<parameterDescription><![CDATA[단축주문번호]]></parameterDescription>
+	</parameter>
+	<parameter name="customer_name" class="java.lang.String">
+		<parameterDescription><![CDATA[받는고객]]></parameterDescription>
+	</parameter>
+	<parameter name="delivery_message" class="java.lang.String">
+		<parameterDescription><![CDATA[배송메세지]]></parameterDescription>
+	</parameter>
+	<parameter name="change_allow_yn" class="java.lang.String">
+		<parameterDescription><![CDATA[대체여부]]></parameterDescription>
+	</parameter>
+	<parameter name="order_cost" class="java.lang.String">
+		<parameterDescription><![CDATA[판매단가]]></parameterDescription>
+	</parameter>
+	<parameter name="order_qty" class="java.lang.String">
+		<parameterDescription><![CDATA[주문수량]]></parameterDescription>
+	</parameter>
+	<parameter name="goods_name" class="java.lang.String">
+		<parameterDescription><![CDATA[상품명]]></parameterDescription>
+	</parameter>
+	<parameter name="goods_code" class="java.lang.String">
+		<parameterDescription><![CDATA[상품코드]]></parameterDescription>
+	</parameter>
+	<parameter name="rootPath" class="java.lang.String">
+		<parameterDescription><![CDATA[파일경로]]></parameterDescription>
+	</parameter>
+	<parameter name="goods_spec" class="java.lang.String">
+		<parameterDescription><![CDATA[규격]]></parameterDescription>
+	</parameter>
+	<parameter name="zone_code" class="java.lang.String">
+		<parameterDescription><![CDATA[존코드]]></parameterDescription>
+	</parameter>
+	<parameter name="delivery_count" class="java.lang.String">
+		<parameterDescription><![CDATA[차수]]></parameterDescription>
+	</parameter>
+	<parameter name="delivery_date" class="java.lang.String">
+		<parameterDescription><![CDATA[배송일]]></parameterDescription>
+	</parameter>
+	<parameter name="goods_option_name" class="java.lang.String">
+		<parameterDescription><![CDATA[옵션]]></parameterDescription>
+	</parameter>
+	<parameter name="delivery_area_name" class="java.lang.String">
+		<parameterDescription><![CDATA[권역구명]]></parameterDescription>
+	</parameter>
+	<parameter name="order_customer_name" class="java.lang.String">
+		<parameterDescription><![CDATA[수취인]]></parameterDescription>
+	</parameter>
+	<field name="단축주문번호" class="java.lang.String">
+		<fieldDescription><![CDATA[short_order_no]]></fieldDescription>
+	</field>
+	<field name="받는고객" class="java.lang.String">
+		<fieldDescription><![CDATA[customer_name]]></fieldDescription>
+	</field>
+	<field name="상품코드" class="java.lang.String">
+		<fieldDescription><![CDATA[goods_code]]></fieldDescription>
+	</field>
+	<field name="상품명" class="java.lang.String">
+		<fieldDescription><![CDATA[goods_name]]></fieldDescription>
+	</field>
+	<field name="규격" class="java.lang.String">
+		<fieldDescription><![CDATA[goods_spec]]></fieldDescription>
+	</field>
+	<field name="주문수량" class="java.lang.String">
+		<fieldDescription><![CDATA[order_qty]]></fieldDescription>
+	</field>
+	<field name="판매단가" class="java.lang.String">
+		<fieldDescription><![CDATA[order_cost]]></fieldDescription>
+	</field>
+	<field name="배송메시지" class="java.lang.String">
+		<fieldDescription><![CDATA[delivery_message]]></fieldDescription>
+	</field>
+	<field name="대체여부" class="java.lang.String">
+		<fieldDescription><![CDATA[change_allow_yn]]></fieldDescription>
+	</field>
+	<field name="존코드" class="java.lang.String">
+		<fieldDescription><![CDATA[zone_code]]></fieldDescription>
+	</field>
+	<field name="차수" class="java.lang.String">
+		<fieldDescription><![CDATA[delivery_count]]></fieldDescription>
+	</field>
+	<field name="배송일" class="java.lang.String">
+		<fieldDescription><![CDATA[delivery_date]]></fieldDescription>
+	</field>
+	<field name="옵션" class="java.lang.String">
+		<fieldDescription><![CDATA[goods_option_name]]></fieldDescription>
+	</field>
+	<field name="권역구명" class="java.lang.String">
+		<fieldDescription><![CDATA[delivery_area_name]]></fieldDescription>
+	</field>
+	<field name="수취인" class="java.lang.String">
+		<fieldDescription><![CDATA[order_customer_name]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="158" splitType="Stretch">
+			<staticText>
+				<reportElement x="142" y="1" width="275" height="50" uuid="659b6a58-4086-4079-9b38-1e590db4d2c0"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="20" isBold="true" isUnderline="false" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[주문별 배송 메모 리스트]]></text>
+			</staticText>
+			<line>
+				<reportElement x="142" y="51" width="273" height="1" uuid="b23fcd60-7103-411d-98e5-810b959b846a"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="199" y="58" width="10" height="45" uuid="039a5fa5-ff13-4cc5-94e5-d356a14ebb9e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="20" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[(]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="356" y="58" width="10" height="45" uuid="016e8ca7-2a5f-4c55-9eef-0c8e72dae863"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="20" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="290" y="58" width="61" height="45" uuid="9690a15e-0065-414c-a790-9a7cff8f3c6e"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="15" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[/         차]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="111" width="49" height="47" uuid="00fcf4cc-276b-4a94-aedb-a05413e87445"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[단축번호]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="49" y="111" width="40" height="47" uuid="66061d70-bc55-42b5-a47c-97418fe035e1"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[수취인]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="314" y="58" width="10" height="45" uuid="9d4b08b4-616d-413d-baf6-c5b3b396be1a"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="15" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{차수}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="209" y="58" width="80" height="45" uuid="ca4ac498-8267-446c-ad16-a36546ab5888"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="15" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{배송일}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="89" y="111" width="185" height="47" uuid="5ac08a29-957e-46ef-bcff-53005bcfbee8"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[권역구명]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="274" y="111" width="281" height="47" uuid="e0dba390-6f27-418b-9766-7aa29eb0c535"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[배송메세지]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="37" splitType="Immediate">
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="0" y="0" width="49" height="37" uuid="1188f32f-27c0-4f4e-ab07-91a624cd52ae"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{단축주문번호}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="49" y="0" width="40" height="37" uuid="2a9eaaca-40c5-4fd1-ab38-daefeb8e6a0b"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{수취인}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="274" y="0" width="281" height="37" uuid="7eb4a8fc-fa66-4524-9038-03e1e91b5f43"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{배송메시지}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="89" y="0" width="185" height="37" uuid="b88e335a-ae95-462d-93f4-f860e02f8348"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{권역구명}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="21" splitType="Immediate">
+			<textField>
+				<reportElement x="244" y="1" width="30" height="20" uuid="10a76f88-df91-4bc9-8702-51282c0556ce"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER} + " /"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="277" y="1" width="26" height="20" uuid="88eb59cd-986a-497f-80da-a2715296bc6c"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

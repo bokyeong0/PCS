@@ -1,0 +1,48 @@
+/********************************************************************************/
+/*								                                                */
+/*  Design      			                                                */
+/*  Date : 2016-07-26		                                                  	*/
+/*      				         			                                    */
+/*									                                            */
+/*******************************************************************************/
+
+
+/* h1테그및 스타일 margin 조정 */
+h1, .h1, h2, .h2, h3, .h3{
+	margin-top: 10px;
+}
+/* 테이블 vertical 가운데 정렬 */
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+  vertical-align: middle;
+}
+
+
+/* 여백 조정용*/
+.navbar{margin-bottom: 0px;}
+.page-header{margin-top: 0px;}
+.bootstrap-table{margin-bottom: 20px;}
+
+.wd20{width: 20px;}
+.mb10{margin-bottom: 10px;}
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////
+	테이블 데이터 컬럼 길이 조절 CSS
+//////////////////////////////////////////////////////////////////////////////////////////////// */
+.orgOrderNo, .orgOrderNo > .th-inner  {width: 140px;}
+.goodsName, .goodsName > .th-inner  {width: 200px;}
+.makerName, .makerName > .th-inner  {width: 200px;}
+.comDesc, .comDesc > .th-inner  {width: 200px;}
+.useYn, .useYn > .th-inner  {width: 75px;}
+.shortOrderNo, .shortOrderNo > .th-inner  {width: 100px;}
+.goodsOptionName, .goodsOptionName > .th-inner  {width: 150px;}
+.deliveryMessage, .deliveryMessage > .th-inner  {width: 400px;}
+.goodsSpec, .goodsSpec > .th-inner  {width: 110px;}
+.categoryLarge, .categoryLarge > .th-inner  {width: 150px;}
+.categoryMiddle, .categoryMiddle > .th-inner  {width: 150px;}
+.goodsMessage > .th-inner {width:400px;}
+.deliveryAreaName > .th-inner {width:120px;}

@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vertexid.nhmarket.pcs.service.impl.PcsMoblieMapper">
+    
+    <!-- 헤더 조회  -->
+	<select id="selectHeader" resultType="vertexid.nhmarket.pcs.service.PickHeaderVO" >
+	    SELECT 
+	    	pick_id
+	    	, state_code
+	    	, worker_id
+	    	, delivery_date
+	    	, start_pick_date
+    	FROM 
+    		tb_pick_h
+		WHERE
+			pick_id = #{pickId}
+	</select>
+	
+    <!-- 헤더 조회  -->
+	<select id="selectStateHeaderList" resultType="vertexid.nhmarket.pcs.service.PickHeaderVO" parameterType="vertexid.nhmarket.pcs.service.PickingStateVO">
+	    SELECT 
+	    	pick_id
+	    	, state_code
+	    	, worker_id
+	    	, delivery_date
+	    	, start_pick_date
+    	FROM 
+    		tb_pick_h
+		WHERE
+			pick_id IN  
+			<foreach collection="pickIdList" item="pickId" separator="," open="(" close=")">
+				'${pickId}'
+			</foreach>
+	</select>
+			
+	<!-- 디테일 조회  -->
+	<select id="selectMappingDetailList" resultType="vertexid.nhmarket.pcs.service.PickMobileDetailVO" parameterType="hashMap">
+	    SELECT 
+	    	d.pick_id
+			, d.pick_row_no
+			, d.goods_code
+			, d.sales_goods_code
+			, d.goods_name
+			, d.order_qty
+			, d.pick_qty
+			, d.change_allow_yn
+			, d.change_goods_name
+			, d.change_goods_code
+			, d.change_pick_qty
+			, d.state_code
+			, d.create_user_id
+			, d.create_date
+			, d.update_user_id
+			, d.update_date  
+			, d.order_cost  
+			, d.sold_out_reason  
+			, d.maker_name  
+			, d.goods_spec  
+			, d.change_goods_cost  
+			, d.goods_option_name
+			, d.category_large	  
+			, d.category_middle  
+			, h.zone_code
+			, h.short_order_no
+			, h.delivery_message
+			, h.customer_name
+            , h.order_customer_name
+            , d.promotion_name
+            , h.goods_message
+            , d.goods_stock_code
+    	FROM 
+    		tb_pick_d d LEFT join tb_pick_h h 
+    	ON
+    		d.pick_id = h.pick_id
+		WHERE
+			d.pick_id IN  
+			<foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+				#{item}
+			</foreach>
+		ORDER BY 
+			d.pick_id
+	</select>
+	
+	<!-- 헤더 피킹 시작 업데이트  -->
+	<update id="updateStartPickHeader" parameterType="vertexid.nhmarket.pcs.service.PickingStateVO">
+	    UPDATE
+	   		tb_pick_h
+	   	SET
+			worker_id = #{workerId} 
+			, start_pick_date = NOW()
+		WHERE
+			pick_id IN  
+			<foreach collection="pickIdList" item="pickId" separator="," open="(" close=")">
+				'${pickId}'
+			</foreach>
+	</update>
+	
+	<!-- 작업완료 - 헤더 피킹 끝 업데이트 (오늘 날짜만 디테일 테이블에서 pickId로 조회시 전체 완료 된것만 헤더테이블에 완료처리  -->
+	<update id="updateEndPickHeader" parameterType="java.lang.String">
+	    UPDATE 
+	    	tb_pick_h 
+    	SET
+			state_code = IF((SELECT COUNT(pick_id) FROM tb_pick_d	WHERE pick_id = #{pick_id} AND state_code != '2') = 0, '2', state_code)
+			,end_pick_date = IF((SELECT COUNT(pick_id) FROM tb_pick_d	WHERE pick_id = #{pick_id} AND state_code != '2') = 0, NOW(), null)
+		WHERE 
+			pick_id = #{pick_id}
+			AND delivery_date = DATE_FORMAT(NOW(), "%Y%m%d")
+			AND state_code != '2'
+	</update>
+	
+	<!-- 작업완료 - 디테일 피킹 끝 업데이트 -->
+	<update id="updateEndPickDetail" parameterType="vertexid.nhmarket.pcs.service.PickMobileDetailVO">
+	    UPDATE 
+	    	tb_pick_d 
+   		SET 
+   			state_code = '2', 
+   			pick_qty = #{pick_qty}, 
+   			change_goods_name = #{change_goods_name}, 
+   			change_goods_code = #{change_goods_code}, 
+   			change_pick_qty = #{change_pick_qty}, 
+   			sold_out_reason = #{sold_out_reason},
+   			change_goods_cost = #{change_goods_cost},
+   			update_user_id = #{worker_id},
+   			update_date = NOW(),
+   			scan_goods_code = #{scan_goods_code},
+   			goods_weight = #{goods_weight},
+   			change_goods_weight = #{change_goods_weight}
+		WHERE 
+			pick_id = #{pick_id} AND 
+			pick_row_no = #{pick_row_no}
+	</update>
+	
+	<!-- 피킹 취소  -->
+	<update id="updatePickCancel" >
+	    UPDATE 
+	    	tb_pick_h 
+    	SET 
+			start_pick_date = null
+			, worker_id = null
+	    WHERE
+	        pick_id IN  
+			<foreach collection="list" item="pickId" separator="," open="(" close=")">
+				'${pickId}'
+			</foreach>
+	</update>
+	
+	<!-- 공통코드 조회 -->
+	<select id="selectComGroupCodeList" resultType="vertexid.nhmarket.pcs.service.ComCodeVO">
+	    SELECT 
+		    com_group_code,
+		    com_code,
+		    com_name,
+		    com_order,
+		    com_sub_code,
+		    com_desc,
+		    use_yn,
+		    create_user_id,
+		    create_date,
+		    update_user_id,
+		    update_date
+		FROM
+		    tb_com_code
+	    WHERE
+	        use_yn = 'Y'
+	        AND com_group_code IN  
+			<foreach collection="list" item="comGroupCode" separator="," open="(" close=")">
+				'${comGroupCode}'
+			</foreach>
+		ORDER BY com_order ASC
+	</select>
+	
+	<!-- 공통코드 업데이트 -->
+	<update id="updateComCode" parameterType="vertexid.nhmarket.pcs.service.ComCodeVO">
+	    UPDATE 
+	    	tb_com_code
+    	<set>
+   	    	<if test="com_name != null">
+				 com_name = #{com_name}, 
+			</if>
+   	    	<if test="com_order != null">
+				 com_order = #{com_order}, 
+			</if>
+   	    	<if test="com_sub_code != null">
+				 com_sub_code = #{com_sub_code}, 
+			</if>
+   	    	<if test="com_desc != null">
+				 com_desc = #{com_desc}, 
+			</if>
+   	    	<if test="use_yn != null">
+				 use_yn = #{use_yn}, 
+			</if>
+			 update_user_id = 'SYSTEM', 
+			 update_date = NOW()
+		</set>
+	    WHERE
+	        com_group_code = #{com_group_code}
+	        AND com_code = #{com_code}
+	</update>
+	
+	<!-- 피킹 아이디로 주문정보 가져오기 -->
+	<select id="selectOrderInfo" resultType="vertexid.nhmarket.pcs.service.PickMobileDetailVO">
+	    SELECT 
+	    	order_date
+	      , order_no
+    	FROM 
+			tb_pick_h
+	    WHERE
+	        pick_id IN  
+			<foreach collection="list" item="pickId" separator="," open="(" close=")">
+				'${pickId}'
+			</foreach>
+		GROUP BY order_date, order_no
+	</select>
+	
+	<!-- 완료 여부  -->
+	<select id="selectHeaderComplete" parameterType="egovMap" resultType="java.lang.Integer">
+   		SELECT 
+		    COUNT(short_order_no) AS 'count'
+		FROM
+		    (SELECT 
+		        	short_order_no
+		            , COUNT(short_order_no) org_cnt
+		            , COUNT(CASE state_code WHEN 2 THEN 1 END) cur_cnt
+		    FROM
+		        tb_pick_h
+		    WHERE 
+				 order_date     = #{order_date}
+			AND  order_no       = #{order_no} 
+		    GROUP BY delivery_date, delivery_count, short_order_no) list
+		WHERE
+		    org_cnt = cur_cnt
+<!-- 	SELECT 
+		(CASE state_code WHEN 2 THEN 1 ELSE 0 END) as 'count'
+	FROM
+		tb_pick_h
+	where 
+		pick_id = #{pick_id}
+	and order_date = #{order_date}
+	and order_no = #{order_no}  -->
+	</select>
+
+	<!-- order_date, order_no로 제품 목록 가져오기  -->
+	<select id="selectTotalList" parameterType="egovMap" resultType="vertexid.nhmarket.pcs.service.PickTotalVO">
+	    SELECT 
+			h.pick_id
+			, h.delivery_date
+			, h.delivery_count
+			, h.short_order_no
+			, h.order_date
+			, h.order_no
+			, h.zone_code
+			, h.tray_no
+			, h.delivery_area_name
+			, h.customer_name
+			, h.label_state
+			, h.label_print_count
+			, h.trolley_id
+			, getWorkerIdToName(worker_id) as 'worker_id'
+			, h.state_code
+			, h.create_user_id
+			, h.create_date
+			, h.update_user_id
+			, h.update_date
+			, h.org_delivery_count
+			, h.start_pick_date
+			, h.end_pick_date
+			, h.delivery_amount
+			, h.order_customer_name
+			, h.tel_no_1
+			, h.tel_no_2
+			, h.address
+			, h.address_detail
+			, h.free_gift_name
+			, h.delivery_message
+			, d.pick_row_no
+			, getStoreCutGoodsCode(goods_code) as 'goods_code'
+			, d.sales_goods_code
+			, d.goods_name
+			, sum(d.order_qty) as order_qty
+			, sum(d.pick_qty) as pick_qty
+			, d.change_allow_yn
+			, max(d.change_goods_name) as change_goods_name
+			, max(d.change_goods_code) as change_goods_code
+			, sum(d.change_pick_qty) as change_pick_qty
+			, d.order_cost
+			, max(d.sold_out_reason) as sold_out_reason
+			, d.maker_name
+			, d.goods_spec
+			, d.goods_option_name
+			, d.category_large	  
+			, d.category_middle  
+			, d.tax_type
+			, d.order_row_no
+			, max(d.change_goods_cost) as change_goods_cost
+			, d.pay_method
+			, max(IFNULL(d.e_pay_cost, 0)) as e_pay_cost
+			, max(IFNULL(d.dlvry_pay_cost, 0)) as dlvry_pay_cost
+			, max(IFNULL(d.e_sent_fee, 0)) as e_sent_fee
+			, max(IFNULL(d.dlvry_sent_fee, 0)) as dlvry_sent_fee
+			, max(IFNULL(d.e_card_dc, 0)) as e_card_dc
+			, max(IFNULL(d.dlvry_card_dc, 0)) as dlvry_card_dc
+			, max(IFNULL(d.coupon_dc, 0)) as coupon_dc
+			, max(IFNULL(d.pay_cost, 0)) as pay_cost
+			, d.promotion_name
+			, h.goods_message
+			, IFNULL(d.n_coupon_cost, 0) as n_coupon_cost
+		FROM 
+			tb_pick_h h, tb_pick_d d
+		WHERE 
+			h.pick_id           = d.pick_id
+			AND order_date      = #{order_date}
+			AND order_no        = #{order_no}
+			AND h.delivery_date = DATE_FORMAT(now(),'%Y%m%d')
+		GROUP BY 
+			d.order_row_no, getStoreCutGoodsCode(goods_code)
+		ORDER BY
+			 pick_id, CAST(order_row_no AS UNSIGNED)
+			<!--  CAST(order_row_no AS UNSIGNED), pick_id --> 			
+	</select>
+	
+	<!-- 프린트 대상 조회 -->
+	<select id="printPickIds" resultType="java.lang.String">
+	    SELECT 
+	    	pick_id
+    	FROM 
+			tb_pick_h
+	    WHERE
+	        print_yn = 'N'
+	    AND
+	    	delivery_date = DATE_FORMAT(now(),'%Y%m%d')
+	</select>
+	
+	<!-- 프린트 완료 처리 -->  
+	<update id="updatePrintYes" parameterType="hashMap">
+		UPDATE
+	    	tb_pick_h
+	    SET
+	    	print_yn = 'Y'
+	    ,   update_user_id = 'SYSTEM'
+	    ,   update_date = now()
+	    WHERE
+	    	state_code = 2
+	    AND	order_date = #{order_date}
+	   	AND order_no   = #{order_no}
+	    AND print_yn   = 'N'
+	</update>
+	
+	<insert id="insertPrintFileData" parameterType="hashMap">
+		INSERT INTO tb_print /* insertPrintFileData */
+			(file_type, order_no, file_name, state, create_date)
+		VALUES
+			(#{file_type}, #{order_no}, #{file_name}, #{state}, NOW())
+	</insert>
+	
+	<update id="updatePrintFileData" parameterType="hashMap">
+		UPDATE tb_print /* updatePrintFileData */
+		SET
+			state = #{state}
+			, update_date = NOW()
+		WHERE order_no = #{order_no}
+		AND file_type = #{file_type}
+	</update>
+	
+	<select id="selectPrintFileData" resultType="hashMap">
+		SELECT /* selectPrintFileData 파일 생성된 파일명 1건만 select */
+			order_no, file_name, file_type
+		FROM	 tb_print
+		WHERE state = '2'
+		ORDER BY create_date, print_id
+		limit 1
+	</select>
+	
+	<select id="selectPrintFileInProgress" resultType="java.lang.Integer">
+		SELECT /* selectPrintFileInProgress 프린트 진행중 */
+			COUNT(print_id) AS CNT
+		FROM	 tb_print
+		WHERE state = '3'
+	</select>
+	
+	<delete id ="deletePrintFileData" parameterType="java.lang.String">
+		DELETE /* deletePrintFileData 어제 데이터 삭제 */
+		FROM tb_print
+		WHERE create_date <![CDATA[<]]> DATE_FORMAT(concat(#{today},'000000'), '%Y%m%d%H%i%s')
+	</delete>
+	
+	<delete id ="updatePrintFileFailData" parameterType="java.lang.String">
+		UPDATE tb_print /* updatePrintFileFailData 오류데이터 제거(Delete) */
+		SET
+			state = 'D'
+		WHERE state = '2'
+	</delete>
+	
+	<update id="alterPrintFileIdReset" parameterType="hashMap">
+		ALTER TABLE TB_PRINT AUTO_INCREMENT=1
+	</update>
+	
+	<select id="selectPrintFileDataOrderNo" parameterType="hashMap" resultType="java.lang.Integer">
+		SELECT /* selectPrintFileDataOrderNo */
+			COUNT(print_id) AS print_id
+		FROM	 tb_print
+		WHERE order_no = #{order_no}
+		AND file_type = #{file_type}
+	</select>
+	
+	<update id="updatePrintFileError" parameterType="hashMap">
+		UPDATE tb_print /* updatePrintFileError */
+		SET
+			state = 'T'
+		WHERE state = '3'
+		AND NOW() - CREATE_DATE <![CDATA[>]]> 500
+	</update>
+	
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<Configuration>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d %5p [%c.%M] %m%n" />
+        </Console>
+         		 
+        <!-- 개발서버 로그기록 -->
+        
+        <RollingFile name="dailyRollingFileAppender"
+		 fileName="D:/ehanaro_pcs/log/ehanaro_pcs_2/ehanaro_pcs_2.log" 
+		 filePattern="D:/ehanaro_pcs/log/ehanaro_pcs_2/ehanaro_pcs_2.log.%d{yyyy-MM-dd-HH}"
+		 append="false">
+		 
+		<!-- 운영서버 로그기록 -->
+         <!-- 
+        <RollingFile name="dailyRollingFileAppender"
+		 fileName="D:/ehanaro_pcs/log/ehanaro_pcs_2/ehanaro_pcs_2.log" 
+		 filePattern="D:/ehanaro_pcs/log/ehanaro_pcs_2/ehanaro_pcs_2.log.%d{yyyy-MM-dd-HH}"
+		 append="false">
+		 -->
+		 
+		 		 
+			<PatternLayout pattern="%d %5p [%c.%M] %m%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+			</Policies>
+		</RollingFile>
+    </Appenders>
+    <Loggers>
+        <Logger name="java.sql" level="ERROR" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="dailyRollingFileAppender" />
+        </Logger>
+        <Logger name="egovframework" level="ERROR" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="dailyRollingFileAppender" />
+        </Logger>
+        <Logger name="vertexid" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="dailyRollingFileAppender" />
+        </Logger>
+          <!-- log SQL with timing information, post execution -->
+        <Logger name="jdbc.sqltiming" level="ERROR" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="dailyRollingFileAppender" />
+        </Logger>
+        <Logger name="jdbc.sqlonly" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="dailyRollingFileAppender" />
+        </Logger>
+        <Logger name="org.springframework" level="ERROR" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="dailyRollingFileAppender" />
+        </Logger>
+        <Root level="ERROR">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="dailyRollingFileAppender" />
+        </Root>
+    </Loggers>
+</Configuration>

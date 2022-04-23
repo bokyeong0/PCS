@@ -1,0 +1,2036 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vertexid.nhmarket.pcs.service.impl.PcsMapper">
+<!-- TODO 추후 업무에 따른 쿼리파일 분리 필요 -->
+	<!-- 오더 데이터 조회
+		 20160829 컬럼 추가 (주문단가:order_cost, 제조사명:maker_name, 상품규격:goods_spec)
+		 20161006 컬럼 추가 
+	  	 	  card_dc_cost
+			, delivery_amount
+			, goods_option_name
+			, tax_type
+			, order_customer_name
+			, tel_no_1
+			, tel_no_2
+			, address
+			, free_gift_name
+			, delivery_message
+			, order_row_no
+ 		20161024 엑셀데이터 임포트 컬럼 추가 (전시카테고리(대):category_large / 전시카테고리(중):category_middle)
+		20161024 엑셀데이터 임포트 컬럼 삭제 (카드할인가:card_dc_cost)
+	 -->
+	<select id="selectOrderList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT short_order_no
+			, order_date
+			, order_no
+			, order_row_no
+			, zone_code
+			, getStoreCutGoodsCode(goods_code) as 'goods_code'
+			, delivery_area_name
+			, sales_goods_code
+			, order_qty
+			, change_allow_yn
+			, goods_spec
+			, order_cost
+			, maker_name
+			, goods_option_name
+			, tax_type
+			, category_large
+			, category_middle
+			, delivery_amount
+			, order_customer_name
+			, delivery_message
+			, promotion_name 
+			, free_gift_name	
+			, goods_message
+			, state_code
+			, n_coupon_cost
+		FROM tb_order
+		WHERE 1 = 1
+		<if test="search_delivery_date != null and search_delivery_date !=''">
+			AND delivery_date = #{search_delivery_date}
+		</if>
+		<if test="search_delivery_count != null and search_delivery_count !=''">
+			AND delivery_count = #{search_delivery_count}
+		</if>
+		<if test="search_zone_code != null and search_zone_code !=''">
+			AND zone_code = #{search_zone_code}
+		</if>
+		<if test="search_state_code != null and search_state_code !=''">
+			AND state_code = #{search_state_code}
+		</if>
+		<if test="search_order_date != null and search_order_date !=''">
+			AND order_date = #{search_order_date}
+		</if>
+		<if test="search_order_no != null and search_order_no !=''">
+			AND order_no = #{search_order_no}
+		</if>
+		
+		ORDER BY short_order_no, cast(order_row_no as unsigned), delivery_date, delivery_count, order_date, 
+				order_no, zone_code, goods_code
+	</select>
+	
+	<select id="orderCnt" parameterType="vertexid.nhmarket.pcs.service.DefaultVO" resultType="egovMap">
+		SELECT /* 주문건수, N쿠폰 주문수 COUNT */
+			IFNULL(SUM(1), 0) AS ORDER_CNT
+			, IFNULL(SUM(N_COUPON_COST), 0) AS N_COUPON_CNT
+		FROM (
+				SELECT ORDER_DATE
+						, ORDER_NO
+						, CASE WHEN SUM(N_COUPON_COST) <![CDATA[>]]> 0 THEN 1 
+						ELSE 0 END AS N_COUPON_COST
+				FROM   TB_ORDER 
+				WHERE  1 = 1 
+		       	<if test="search_delivery_date != null and search_delivery_date !=''">
+					AND DELIVERY_DATE = #{search_delivery_date}
+				</if>
+				<if test="search_delivery_count != null and search_delivery_count !=''">
+					AND DELIVERY_COUNT = #{search_delivery_count}
+				</if>
+				GROUP BY CONCAT(ORDER_DATE,ORDER_NO)
+				) O
+	</select>
+	
+	<select id="orderItemCnt" parameterType="vertexid.nhmarket.pcs.service.DefaultVO" resultType="java.lang.String">
+		SELECT IFNULL(SUM(1), 0)
+		FROM (
+			   SELECT 1 
+			   FROM TB_ORDER
+				WHERE 1 = 1 
+		       	<if test="search_delivery_date != null and search_delivery_date !=''">
+					AND DELIVERY_DATE = #{search_delivery_date}
+				</if>
+				<if test="search_delivery_count != null and search_delivery_count !=''">
+					AND DELIVERY_COUNT = #{search_delivery_count}
+				</if>
+				GROUP BY GOODS_CODE      
+		) I	
+	</select>
+
+	<!-- 2차 지시 오더 데이터 조회
+		 20160829 컬럼 추가 (주문단가:order_cost, 제조사명:maker_name, 상품규격:goods_spec)	
+		 20161006 컬럼 추가 
+	  	 	  card_dc_cost
+			, delivery_amount
+			, goods_option_name
+			, tax_type
+			, order_customer_name
+			, tel_no_1
+			, tel_no_2
+			, address
+			, free_gift_name
+			, delivery_message
+			, order_row_no		
+  		20161024 엑셀데이터 임포트 컬럼 추가 (전시카테고리(대):category_large / 전시카테고리(중):category_middle)
+		20161024 엑셀데이터 임포트 컬럼 삭제 (카드할인가:card_dc_cost)
+	선택라벨출력시 데이터 정렬하는 쿼리
+	 -->
+	<select id="selectOrder2ndList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT short_order_no
+			, delivery_date
+			, delivery_count
+			, order_date
+			, order_no
+			, order_row_no
+			, zone_code
+			, getStoreCutGoodsCode(goods_code) as 'goods_code'
+			, delivery_area_name
+			, customer_name
+			, sales_goods_code
+			, goods_name
+			, order_qty
+			, change_allow_yn
+			, goods_spec
+			, order_cost
+			, maker_name
+			, goods_option_name
+			, tax_type
+			, category_large
+			, category_middle
+			, delivery_amount
+			, order_customer_name
+			, tel_no_1
+			, tel_no_2
+			, address
+			, address_detail
+			, delivery_message
+			, promotion_name 
+			, free_gift_name	
+			, pay_method
+			, e_pay_cost
+			, dlvry_pay_cost
+			, e_sent_fee
+			, dlvry_sent_fee
+			, e_card_dc
+			, dlvry_card_dc
+			, coupon_dc
+			, pay_cost
+			, goods_message
+			, state_code
+			, create_user_id
+			, create_date
+			, update_user_id
+			, update_date
+			, org_delivery_count
+			, goods_stock_code
+			, n_coupon_cost
+		FROM tb_order
+		WHERE 1 = 1
+		<if test="search_delivery_date != null and search_delivery_date !=''">
+			AND delivery_date = #{search_delivery_date}
+		</if>
+		<if test="search_delivery_count != null and search_delivery_count !=''">
+			AND delivery_count = #{search_delivery_count}
+		</if>
+		<if test="search_zone_code != null and search_zone_code !=''">
+			AND zone_code = #{search_zone_code}
+		</if>
+		<if test="search_state_code != null and search_state_code !=''">
+			AND state_code = #{search_state_code}
+		</if>
+		<if test="search_order_date != null and search_order_date !=''">
+			AND order_date = #{search_order_date}
+		</if>
+		<if test="search_order_no != null and search_order_no !=''">
+			AND order_no = #{search_order_no}
+		</if>
+		ORDER BY zone_code, delivery_date, delivery_count, short_order_no, delivery_area_name,
+		order_date, order_no, goods_code
+	</select>
+
+	<!-- 데이터 조회
+		 20160829 컬럼 추가 (주문단가:order_cost, 제조사명:maker_name, 상품규격:goods_spec)
+  		20161024 엑셀데이터 임포트 컬럼 추가 (전시카테고리(대):category_large / 전시카테고리(중):category_middle)
+		20161024 엑셀데이터 임포트 컬럼 삭제 (카드할인가:card_dc_cost)
+	 -->
+	<select id="selectChoiceOrderList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT delivery_date
+			, delivery_count
+			, short_order_no
+			, org_order_no
+			, getStoreCutGoodsCode(goods_code) as 'goods_code'
+			, delivery_area_name
+			, customer_name
+			, sales_goods_code
+			, goods_name
+			, order_qty
+			, change_allow_yn
+			, zone_code
+			, state_code
+			, create_user_id
+			, create_date
+			, update_user_id
+			, update_date
+			, maker_name
+			, goods_spec
+			, card_dc_cost
+			, delivery_amount
+			, goods_option_name
+			, tax_type
+			, order_customer_name
+			, tel_no_1
+			, tel_no_2
+			, address
+			, free_gift_name
+			, delivery_message
+			, order_row_no
+			, category_large
+			, category_middle			
+		FROM tb_order
+		WHERE 1 = 1
+		<if test="order_key != null and order_key !=''">
+			AND
+			CONCAT(delivery_date,delivery_count,short_order_no,org_order_no,goods_code)
+			IN
+			<foreach collection="order_key" item="order_key" separator=","
+				open="(" close=")">
+				'${order_key}'
+			</foreach>
+		</if>
+		ORDER BY delivery_date, delivery_count, short_order_no, org_order_no
+		,zone_code, goods_code
+	</select>
+
+
+	<!--  기존 예정 데이터 삭제 -->
+	<delete id="deleteImportData" parameterType="vertexid.nhmarket.pcs.service.DefaultVO">
+		DELETE FROM tb_order
+		WHERE state_code = '0'
+		<if test="search_delivery_date != null and search_delivery_date !=''">
+			AND delivery_date = #{search_delivery_date}
+		</if>
+		<if test="search_delivery_count != null and search_delivery_count !=''">
+			AND delivery_count = #{search_delivery_count}
+		</if>
+	</delete>
+
+	<!-- 데이타 등록
+		20160829 엑셀데이터 임포트 컬럼 추가 (주문단가:order_cost, 제조사명:maker_name, 상품규격:goods_spec)
+		20161024 엑셀데이터 임포트 컬럼 추가 (전시카테고리(대):category_large / 전시카테고리(중):category_middle)
+		20161024 엑셀데이터 임포트 컬럼 삭제 (카드할인가:card_dc_cost)
+		20180618 엑셀데이터 임포트 컬럼 추가 (상품재고유형)
+	-->
+	<insert id="insertImportData" parameterType="vertexid.nhmarket.pcs.service.OrderVO">
+		INSERT INTO tb_order
+		( short_order_no
+		, delivery_date
+		, delivery_count
+		, order_date
+		, order_no
+		, order_row_no
+		, delivery_area_name
+		, customer_name
+		, goods_code
+		, sales_goods_code
+		, goods_name
+		, order_qty
+		, change_allow_yn
+		, zone_code
+		, goods_spec
+		, order_cost
+		, maker_name
+		, goods_option_name
+		, tax_type
+		, category_large
+		, category_middle
+		, delivery_amount
+		, order_customer_name
+		, tel_no_1
+		, tel_no_2
+		, address
+		, address_detail
+		, delivery_message
+		, free_gift_name
+		, pay_method
+		, e_pay_cost  
+		, dlvry_pay_cost
+		, e_sent_fee  
+		, dlvry_sent_fee
+		, e_card_dc  
+		, dlvry_card_dc
+		, coupon_dc    
+		, pay_cost
+		, promotion_name
+		, goods_message
+		, org_delivery_count
+		, create_user_id
+		, update_date
+		, goods_stock_code
+		, n_coupon_cost
+		)
+		VALUES ( #{short_order_no}
+		, #{delivery_date}
+		, #{delivery_count}
+		, #{order_date}
+		, #{order_no}
+		, #{order_row_no}
+		, #{delivery_area_name}
+		, #{customer_name}
+		, #{goods_code}
+		, #{sales_goods_code}
+		, #{goods_name}
+		, #{order_qty}
+		, #{change_allow_yn}
+		, #{zone_code}
+		, #{goods_spec}
+		, #{order_cost}
+		, #{maker_name}
+		, #{goods_option_name}
+		, #{tax_type}
+		, #{category_large}
+		, #{category_middle}
+		, #{delivery_amount}
+		, #{order_customer_name}
+		, #{tel_no_1}
+		, #{tel_no_2}
+		, #{address}
+		, #{address_detail}
+		, #{delivery_message}
+		, #{free_gift_name}
+		, #{pay_method}
+		, #{e_pay_cost}
+		, #{dlvry_pay_cost}
+		, #{e_sent_fee}
+		, #{dlvry_sent_fee}
+		, #{e_card_dc}
+		, #{dlvry_card_dc}
+		, #{coupon_dc}
+		, #{pay_cost}
+		, #{promotion_name}
+		, #{goods_message}
+		, #{org_delivery_count}
+		, #{create_user_id}
+		, #{update_date}
+		, #{goods_stock_code}
+		, #{n_coupon_cost}
+		)
+		ON DUPLICATE KEY UPDATE update_date = now() 
+	</insert>
+
+	<!-- 최근 pickId 조회 -->
+	<select id="selectLastPickId" resultType="String">
+		SELECT
+			pick_id
+		FROM
+			tb_pick_h
+		ORDER by
+			pick_id DESC
+		LIMIT 1
+	</select>
+
+	<!-- Pick 헤더 조회 
+			20160929 컬럼추가 (delivery_amount
+							, order_customer_name
+							, tel_no_1
+							, tel_no_2
+							, address
+							, free_gift_name
+							, delivery_message)
+	-->
+	<select id="selectPickHeader" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT h.pick_id
+			, h.delivery_date
+			, h.delivery_count
+			, h.short_order_no
+			, h.order_date
+			, h.order_no
+			, h.zone_code
+			, h.tray_no
+			, h.delivery_area_name
+			, h.customer_name
+			, h.label_state
+			, h.label_print_count
+			, h.trolley_id
+			, getWorkerIdToName(h.worker_id) as 'worker_id'
+			, h.state_code
+			, h.create_user_id
+			, h.create_date
+			, h.update_user_id
+			, h.update_date
+			, h.org_delivery_count
+			, h.start_pick_date
+			, h.end_pick_date
+			, h.delivery_amount
+			, h.order_customer_name
+			, h.tel_no_1
+			, h.tel_no_2
+			, h.address
+			, h.free_gift_name
+			, h.delivery_message
+			, h.goods_message
+			, d.goods_name
+			, h.delivery_message
+		FROM
+			tb_pick_h h, tb_pick_d d
+		WHERE 1 = 1
+			AND h.pick_id = d.pick_id
+		<if test="search_delivery_date != null and search_delivery_date !=''">
+			AND delivery_date = #{search_delivery_date}
+		</if>
+		<if test="search_delivery_count != null and search_delivery_count !=''">
+			AND delivery_count = #{search_delivery_count}
+		</if>
+		<if test="search_zone_code != null and search_zone_code !=''">
+			AND zone_code = #{search_zone_code}
+		</if>
+		<if test="search_state_code != null and search_state_code !=''">
+			AND h.state_code = #{search_state_code}
+		</if>
+		<if test="nCoupon_yn != null and nCoupon_yn !='' and nCoupon_yn eq 'Y'.toString()">
+			AND d.n_coupon_cost <![CDATA[>]]> 0
+		</if>
+		<if test="nCoupon_yn != null and nCoupon_yn !='' and nCoupon_yn eq 'N'.toString()">
+			AND IFNULL(d.n_coupon_cost, 0) = 0
+		</if>
+		<if test="search_short_order_no != null and search_short_order_no !=''">
+			AND short_order_no = #{search_short_order_no}
+		</if>
+		<if test="search_delivery_area_name != null and search_delivery_area_name !=''">
+			AND h.delivery_area_name LIKE concat('%',#{search_delivery_area_name},'%')
+		</if>
+		<if test="search_goods_name != null and search_goods_name !=''">
+			AND goods_name like concat('%',#{search_goods_name},'%')
+		</if>
+		<if test="search_worker_id != null and search_worker_id !=''">
+			AND getWorkerIdToName(h.worker_id) like concat('%',#{search_worker_id},'%')
+		</if>
+		
+		GROUP BY h.pick_id
+		ORDER BY h.short_order_no
+<!-- 		ORDER BY h.pick_id -->
+	</select>
+
+
+
+	<!-- Pick 상세 조회
+ 		 20160829 컬럼 추가 (주문단가:order_cost, 제조사명:maker_name, 상품규격:goods_spec)
+ 		 20160929 컬럼 추가 (card_dc_cost
+						, goods_option_name
+						, tax_type
+						, order_row_no)
+		20161024 엑셀데이터 임포트 컬럼 추가 (전시카테고리(대):category_large / 전시카테고리(중):category_middle)
+	 -->
+	<select id="selectPickDetail" parameterType="String" resultType="egovMap">
+		SELECT pick_id
+			, pick_row_no
+			, getStoreCutGoodsCode(goods_code) as 'goods_code'
+			, sales_goods_code
+			, goods_name
+			, order_qty
+			, pick_qty
+			, change_allow_yn
+			, change_goods_code
+			, change_goods_name			
+			, change_pick_qty
+			, state_code
+			, create_user_id
+			, create_date
+			, update_user_id
+			, update_date
+			, order_cost
+			, maker_name
+			, goods_spec
+			, goods_option_name
+			, tax_type
+			, order_row_no	
+			, category_large
+			, category_middle
+			, change_goods_cost
+			, scan_goods_code
+			, pay_method
+			, e_pay_cost  
+			, dlvry_pay_cost
+			, e_sent_fee  
+			, dlvry_sent_fee
+			, e_card_dc  
+			, dlvry_card_dc
+			, coupon_dc    
+			, pay_cost
+			, promotion_name
+			, order_qty - pick_qty AS 'reason_qty'
+			, change_allow_yn
+		FROM
+			tb_pick_d
+		WHERE
+			pick_id = #{searchPickId}
+		ORDER BY pick_id , pick_row_no ASC
+	</select>
+
+	<!-- Pick 헤더 조회 -->
+	<select id="selectPickHeaderCount" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="Int">
+		SELECT count(pick_id)
+		FROM
+			tb_pick_h
+		WHERE 1 = 1
+		<if test="search_delivery_date != null and search_delivery_date !=''">
+			AND delivery_date = #{search_delivery_date}
+		</if>
+		<if test="search_delivery_count != null and search_delivery_count !=''">
+			AND delivery_count = #{search_delivery_count}
+		</if>
+		<if test="search_zone_code != null and search_zone_code !=''">
+			AND zone_code = #{search_zone_code}
+		</if>
+		<if test="search_state_code != null and search_state_code !=''">
+			AND state_code = #{search_state_code}
+		</if>
+		<if test="search_org_order_no != null and search_org_order_no !=''">
+			AND org_order_no = #{search_org_order_no}
+		</if>
+	</select>
+
+	<!-- 진행상태 (피킹지시) 수정 -->
+	<update id="updateStateCode" parameterType="vertexid.nhmarket.pcs.service.DefaultVO">
+		UPDATE tb_order
+		SET state_code = 1
+		  , update_user_id = 'SYSTEM'
+		  , update_date = now()
+		WHERE 1 = 1
+		AND state_code = 0
+		<if test="search_delivery_date != null and search_delivery_date !=''">
+			AND delivery_date = #{search_delivery_date}
+		</if>
+		<if test="search_delivery_count != null and search_delivery_count !=''">
+			AND delivery_count = #{search_delivery_count}
+		</if>
+		<if test="search_zone_code != null and search_zone_code !=''">
+			AND zone_code = #{search_zone_code}
+		</if>
+		<if test="search_order_date != null and search_order_date !=''">
+			AND order_date = #{search_order_date}
+		</if>
+		<if test="search_order_no != null and search_order_no !=''">
+			AND order_no = #{search_order_no}
+		</if>
+		<if test="order_key != null and order_key !=''">
+			AND
+			CONCAT(delivery_date,delivery_count,short_order_no,order_date,order_no,goods_code)
+			IN
+			<foreach collection="order_key" item="order_key" separator=","
+				open="(" close=")">
+				'${order_key}'
+			</foreach>
+		</if>
+
+	</update>
+	
+	<!-- 피킹지시 헤더 등록 
+			20160929 컬럼 추가 (delivery_amount
+							, order_customer_name
+							, tel_no_1
+							, tel_no_2
+							, address
+							, free_gift_name
+							, delivery_message)
+	-->
+	<insert id="insertPickHeder" parameterType="vertexid.nhmarket.pcs.service.PickHeaderVO">
+		INSERT INTO tb_pick_h
+		( pick_id
+			, delivery_date
+			, delivery_count
+			, short_order_no
+			, order_date
+			, order_no
+			, zone_code
+			, tray_no
+			, delivery_area_name
+			, customer_name
+			, label_state
+			, label_print_count
+			, state_code
+			, trolley_id
+			, create_user_id
+			, org_delivery_count
+			, delivery_amount
+			, order_customer_name
+			, tel_no_1
+			, tel_no_2
+			, address
+			, address_detail
+			, free_gift_name
+			, delivery_message
+			, goods_message
+		)
+		VALUES ( #{pick_id}
+			, #{delivery_date}
+			, #{delivery_count}
+			, #{short_order_no}
+            , #{order_date}
+            , #{order_no}
+			, #{zone_code}
+			, #{tray_no}
+			, #{delivery_area_name}
+			, #{customer_name}
+			, #{label_state}
+			, #{label_print_count}
+			, #{state_code}
+			, #{trolley_id}
+			, #{create_user_id}
+			, #{org_delivery_count}
+			, #{delivery_amount}
+			, #{order_customer_name}
+			, #{tel_no_1}
+			, #{tel_no_2}
+			, #{address}
+			, #{address_detail}
+			, #{free_gift_name}
+			, #{delivery_message}
+			, #{goods_message}
+		)
+
+	</insert>
+	<!-- 피킹지시 디테일 등록
+			20160829 컬럼 추가 (주문단가:order_cost, 제조사명:maker_name, 상품규격:goods_spec)
+			20160929 컬럼 추가 (card_dc_cost
+							, goods_option_name
+							, tax_type
+							, order_row_no							
+			)
+		20161024 엑셀데이터 임포트 컬럼 추가 (전시카테고리(대):category_large / 전시카테고리(중):category_middle)
+		20161024 엑셀데이터 임포트 컬럼 삭제 (카드할인가:card_dc_cost)
+	 -->
+	<insert id="insertPickDetail" parameterType="vertexid.nhmarket.pcs.service.PickDetailVO">
+		INSERT INTO
+		tb_pick_d
+		( pick_id
+			, goods_code
+			, sales_goods_code
+			, goods_name
+			, order_qty
+			, pick_qty
+			, change_allow_yn
+			, state_code
+			, pick_row_no
+			, create_user_id
+			, order_cost
+			, maker_name
+			, goods_spec
+			, goods_option_name
+			, tax_type
+			, order_row_no			
+			, category_large
+			, category_middle
+			, pay_method
+			, e_pay_cost  
+			, dlvry_pay_cost
+			, e_sent_fee  
+			, dlvry_sent_fee
+			, e_card_dc  
+			, dlvry_card_dc
+			, coupon_dc    
+			, pay_cost
+			, promotion_name
+			, goods_stock_code
+			, n_coupon_cost
+		 )
+		VALUES ( #{pick_id}
+			, #{goods_code}
+			, #{sales_goods_code}
+			, #{goods_name}
+			, #{order_qty}
+			, #{pick_qty}
+			, #{change_allow_yn}
+			, #{state_code}
+			, #{pick_row_no}
+			, #{create_user_id}
+			, #{order_cost}
+			, #{maker_name}
+			, #{goods_spec}
+			, #{goods_option_name}
+			, #{tax_type}
+			, #{order_row_no}			
+			, #{category_large}			
+			, #{category_middle}	
+			, #{pay_method}
+			, #{e_pay_cost}
+			, #{dlvry_pay_cost}
+			, #{e_sent_fee}
+			, #{dlvry_sent_fee}
+			, #{e_card_dc}
+			, #{dlvry_card_dc}
+			, #{coupon_dc}
+			, #{pay_cost}
+			, #{promotion_name}	
+			, #{goods_stock_code}	
+			, #{n_coupon_cost}	
+		)
+	</insert>
+
+	<!-- 라벨링 데이터 조회 -->
+	<select id="selectLablePrintingList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT short_order_no
+			, tray_no
+			, order_date
+			, order_no
+			, pick_id
+			, delivery_count
+			, zone_code
+			, delivery_date
+			, trolley_id
+			, SUBSTRING_INDEX(delivery_area_name,' ',-1) AS delivery_area_name
+			, SUBSTRING(order_customer_name, 1, 5) AS order_customer_name
+			, label_state
+			, label_print_count
+			, (select sum(order_qty) from tb_pick_d where pick_id = h.pick_id) as order_qty
+		FROM tb_pick_h h
+		WHERE 1 = 1
+		<if test="search_delivery_date != null and search_delivery_date !=''">
+			AND delivery_date = #{search_delivery_date}
+		</if>
+		<if test="search_delivery_count != null and search_delivery_count !=''">
+			AND delivery_count = #{search_delivery_count}
+		</if>
+		<if test="search_zone_code != null and search_zone_code !=''">
+			AND zone_code = #{search_zone_code}
+		</if>
+		<if test="search_state_code != null and search_state_code !=''">
+			AND state_code = #{search_state_code}
+		</if>
+		<if test="search_order_date != null and search_order_date !=''">
+			AND order_date = #{search_order_date}
+		</if>
+		<if test="search_order_no != null and search_order_no !=''">
+			AND order_no = #{search_order_no}
+		</if>
+			AND label_print_count = '0' 
+		
+		ORDER BY pick_id ASC
+	</select>
+	
+<!-- 	주문별 라벨출력 -->
+	<select id="selectLablePrintingListOrder" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT short_order_no
+			, tray_no
+			, order_date
+			, order_no
+			, pick_id
+			, delivery_count
+			, zone_code
+			, delivery_date
+			, trolley_id
+			, SUBSTRING_INDEX(delivery_area_name,' ',-1) AS delivery_area_name
+			, SUBSTRING(order_customer_name, 1, 5) AS order_customer_name
+			, label_state_orderNo AS label_state
+			, label_print_count
+			, (select sum(order_qty) from tb_pick_d where pick_id = h.pick_id) as order_qty
+		FROM tb_pick_h h
+		WHERE 1 = 1
+		<if test="search_delivery_date != null and search_delivery_date !=''">
+			AND delivery_date = #{search_delivery_date}
+		</if>
+		<if test="search_delivery_count != null and search_delivery_count !=''">
+			AND delivery_count = #{search_delivery_count}
+		</if>
+		<if test="search_zone_code != null and search_zone_code !=''">
+			AND zone_code = #{search_zone_code}
+		</if>
+		<if test="search_state_code != null and search_state_code !=''">
+			AND state_code = #{search_state_code}
+		</if>
+		<if test="search_order_date != null and search_order_date !=''">
+			AND order_date = #{search_order_date}
+		</if>
+		<if test="search_order_no != null and search_order_no !=''">
+			AND order_no = #{search_order_no}
+		</if>
+			AND label_print_count = '0' 
+		
+		ORDER BY short_order_no, zone_code
+	</select>
+	
+<!-- 	권역별 존별 라벨상태 업데이트 -->
+	<update id="updateLabelStateDelivery" parameterType="vertexid.nhmarket.pcs.service.PickHeaderVO">
+		UPDATE tb_pick_h
+		SET label_state_orderNo = #{label_state}
+		WHERE pick_id = #{pick_id}
+	</update>
+
+	<!-- 라벨링 데이터 조회 -->
+	<select id="selectChoiceLablePrintingList" parameterType="vertexid.nhmarket.pcs.service.PickHeaderVO"
+		resultType="egovMap">
+		SELECT short_order_no
+			, tray_no
+			, order_date
+			, order_no
+			, pick_id
+			, delivery_count
+			, zone_code
+			, delivery_date
+			, trolley_id
+			, SUBSTRING_INDEX(delivery_area_name,' ',-1) AS delivery_area_name
+			, SUBSTRING(order_customer_name, 1, 5) AS order_customer_name
+			, label_state
+			, (select sum(order_qty) from tb_pick_d where pick_id = h.pick_id) as order_qty
+		FROM tb_pick_h h
+		WHERE pick_id = #{pick_id}
+		ORDER BY pick_id ASC
+	</select>
+
+	<!-- 출력 업데이트 처리 -->
+	<update id="updateLabelPrintCount" parameterType="egovMap">
+		UPDATE
+			tb_pick_h
+		SET label_print_count = label_print_count +1
+			,update_user_id = 'SYSTEM'
+			,update_date = now()
+		WHERE pick_id = #{pickId}
+	</update>
+	<!--
+	
+	 	20161024 엑셀데이터 임포트 컬럼 추가 (전시카테고리(대):category_large / 전시카테고리(중):category_middle)
+		20161024 엑셀데이터 임포트 컬럼 삭제 (카드할인가:card_dc_cost)
+	 -->
+	<select id="selectPickOrderList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT delivery_date
+			, delivery_count
+			, short_order_no
+			, org_order_no
+			, getStoreCutGoodsCode(goods_code) as 'goods_code'
+			, delivery_area_name
+			, customer_name
+			, sales_goods_code
+			, goods_name
+			, order_qty
+			, change_allow_yn
+			, zone_code
+			, state_code
+			, create_user_id
+			, create_date
+			, update_user_id
+			, update_date
+			, delivery_amount
+			, order_customer_name
+			, tel_no_1
+			, tel_no_2
+			, address
+			, free_gift_name
+			, delivery_message
+			, card_dc_cost
+			, goods_option_name
+			, tax_type
+			, order_row_no
+			, category_large
+			, category_middle
+		FROM tb_order
+		WHERE 1 = 1
+		<if test="search_delivery_date != null and search_delivery_date !=''">
+			AND delivery_date = #{search_delivery_date}
+		</if>
+		<if test="search_delivery_count != null and search_delivery_count !=''">
+			AND delivery_count = #{search_delivery_count}
+		</if>
+		<if test="search_zone_code != null and search_zone_code !=''">
+			AND zone_code = #{search_zone_code}
+		</if>
+		<if test="search_state_code != null and search_state_code !=''">
+			AND state_code = #{search_state_code}
+		</if>
+		<if test="search_org_order_no != null and search_org_order_no !=''">
+			AND org_order_no = #{search_org_order_no}
+		</if>
+		ORDER BY delivery_date
+				, delivery_count
+				, short_order_no
+				, org_order_no
+				, zone_code
+				goods_code
+	</select>
+
+	<!-- 오더 테이블 차수목록 조회 -->
+	<select id="selectDeliveryCountList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT DISTINCT delivery_date
+			, delivery_count
+		FROM tb_order
+		WHERE delivery_date = #{search_delivery_date}
+		ORDER BY delivery_date
+			   , delivery_count DESC
+	</select>
+
+	<!-- 오더 테이블 존목록 조회 -->
+	<select id="selectZoneCodeList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT DISTINCT delivery_date
+				, zone_code
+		FROM tb_order
+		WHERE
+		delivery_date = #{search_delivery_date}
+		<if test="search_delivery_count != null and search_delivery_count !=''">
+			AND delivery_count = #{search_delivery_count}
+		</if>
+		AND zone_code !=''
+		ORDER BY delivery_date
+				, zone_code
+	</select>
+
+	<!-- 헤더 테이블 차수목록 조회 -->
+	<select id="selectPickDeliveryCountList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT DISTINCT delivery_date
+				, delivery_count
+		FROM tb_pick_h
+		WHERE delivery_date = #{search_delivery_date}
+		ORDER BY delivery_date
+				, delivery_count
+	</select>
+
+	<!-- 헤더 테이블 존목록 조회 -->
+	<select id="selectPickZoneCodeList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT DISTINCT delivery_date
+				, zone_code
+		FROM tb_pick_h
+		WHERE
+		delivery_date = #{search_delivery_date}
+		<if test="search_delivery_count != null and search_delivery_count !=''">
+			AND delivery_count = #{search_delivery_count}
+		</if>
+		AND zone_code !=''
+		ORDER BY delivery_date
+				, zone_code
+	</select>
+
+	<!-- 라벨 프린트 횟수 조회 -->
+	<select id="selectLabelPrintCount" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="Int">
+		SELECT count(*)
+		FROM tb_pick_h
+		WHERE label_print_count > 0
+		<if test="search_delivery_date != null and search_delivery_date !=''">
+			AND delivery_date = #{search_delivery_date}
+		</if>
+		<if test="search_delivery_count != null and search_delivery_count !=''">
+			AND delivery_count = #{search_delivery_count}
+		</if>
+	</select>
+
+
+	<!-- 오늘날자 마지막 차수 조회 -->
+	<select id="selectLastDeliveryCount" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="Int">
+		SELECT IFNULL(max(delivery_count),0)
+		FROM tb_order
+		WHERE 1 = 1
+		<if test="search_delivery_date != null and search_delivery_date !=''">
+			AND delivery_date = #{search_delivery_date}
+		</if>
+	</select>
+	
+	<!-- 피킹데이터 오늘날자 마지막 차수 조회 -->
+	<select id="selectPickLastDeliveryCount" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="Int">
+		SELECT IFNULL(max(delivery_count),0)
+		FROM tb_pick_h
+		WHERE 1=1
+		<if test="search_delivery_date != null and search_delivery_date !=''">
+			AND delivery_date = #{search_delivery_date}
+		</if>
+	</select>
+
+	<!-- 코드목록 조회
+		2016.10.04 com_sub_code 추가
+	 -->
+	<select id="selectComCodeList" parameterType="vertexid.nhmarket.pcs.service.ComCodeVO"
+		resultType="vertexid.nhmarket.pcs.service.ComCodeVO">
+		SELECT
+			com_group_code
+			, com_code
+			, com_name
+			, com_order
+			, com_sub_code
+			, com_desc
+			, use_yn
+			, create_user_id
+			, create_date
+			, update_user_id
+			, update_date
+		FROM
+			tb_com_code
+		WHERE
+			use_yn = 'Y'
+		<if test="com_group_code != null and com_group_code !=''">
+			AND com_group_code = #{com_group_code}
+		</if>
+		<if test="com_code != null and com_code !=''">
+			AND com_code = #{com_code}
+		</if>
+		<if test="com_sub_code != null and com_sub_code !=''">
+			AND com_sub_code LIKE #{com_sub_code}
+		</if>
+		ORDER BY com_order ASC
+	</select>
+	
+	<!-- 2016.09.02 추가진행상태 코드 목록 조회 -->
+	<select id="selectStateCodeList" parameterType="vertexid.nhmarket.pcs.service.ComCodeVO"
+		resultType="egovMap">
+			SELECT
+				com_group_code
+				, com_code
+				, com_name
+				, com_order
+				, com_sub_code
+				, com_desc
+				, use_yn
+				, create_user_id
+				, create_date
+				, update_user_id
+				, update_date
+		FROM
+			tb_com_code
+		WHERE use_yn = 'Y'
+			AND com_group_code = 'STATE_CODE'			
+		<if test="com_sub_code != null and com_sub_code !=''">
+			AND com_sub_code LIKE #{com_sub_code}
+		</if>
+		ORDER BY com_order ASC
+	</select>
+
+
+	<!-- Trolley ID 가져오기(일기준 로테이션 생성) -->
+	<select id="selectTrolleyId" resultType="Int">
+		SELECT
+			IFNULL(MAX(CAST(trolley_id AS UNSIGNED) + 1 ), 1) AS 'trolley_id'
+		FROM
+			tb_pick_h
+		WHERE
+			delivery_date = DATE_FORMAT(CURDATE(),'%Y%m%d')
+	</select>
+
+	<!-- 대체상품 현황 조회 
+		2016.10.06 컬럼 추가
+	  	 	  d.card_dc_cost
+			, d.goods_option_name
+			, d.tax_type
+			, d.order_row_no		
+			, h.delivery_amount
+			, h.order_customer_name
+			, h.tel_no_1
+			, h.tel_no_2
+			, h.address
+			, h.free_gift_name
+			, h.delivery_message
+			
+	 	20161024 엑셀데이터 임포트 컬럼 추가 (전시카테고리(대):category_large / 전시카테고리(중):category_middle)
+		20161024 엑셀데이터 임포트 컬럼 삭제 (카드할인가:card_dc_cost)
+		20161025 데이터 추가 ( 제조사:maker_name, 규격:goods_spec)
+			
+	-->
+	<select id="selectChangePickList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT 
+		    *
+		FROM
+		    (SELECT 
+		        a.*,
+		            @rownum:=@rownum + 1 AS row_number
+		    FROM
+		        (SELECT 
+		        h.delivery_date,
+		            h.delivery_count,
+		            h.short_order_no,
+		            h.delivery_area_name,
+		            h.customer_name,
+		            h.zone_code,
+		            d.pick_id,
+		            d.pick_row_no,
+		            GETSTORECUTGOODSCODE(d.goods_code) AS 'goods_code',
+		            d.sales_goods_code,
+		            d.goods_name,
+		            d.order_qty,
+		            d.maker_name,
+		            d.goods_spec,
+		            d.pick_qty,
+		            d.change_allow_yn,
+		            d.change_goods_code,
+		            d.change_goods_name,
+		            d.change_pick_qty,
+		            d.state_code,
+		            d.create_user_id,
+		            DATE_FORMAT(d.create_date, '%Y/%m/%d') AS 'create_date',
+		            d.update_user_id,
+		            DATE_FORMAT(d.update_date, '%Y/%m/%d') AS 'update_date',
+		            d.order_cost,
+		            GETSOLDOUTREASONCODETONAME(d.sold_out_reason) AS 'sold_out_reason',
+		            d.change_goods_cost,
+		            d.order_qty - d.pick_qty AS 'reason_qty',
+		            d.category_large,
+		            d.category_middle,
+		            IFNULL(h.worker_id, '') AS 'worker_id',
+		            d.tax_type,
+		            IFNULL(c.com_name, '') AS 'com_name'
+		            
+		    FROM
+		        tb_pick_h h
+		    LEFT JOIN tb_pick_d d ON h.pick_id = d.pick_id
+            LEFT JOIN tb_com_code c ON
+            (
+				c.com_group_code = 'WORKER_ID'
+				AND h.worker_id = c.com_code
+            )
+		    JOIN (SELECT @rownum:=0) R
+		    WHERE
+		        change_pick_qty > 0
+ 	 		<if test="search_delivery_date != null and search_delivery_date !=''">
+				AND h.delivery_date = #{search_delivery_date}
+			</if>
+			<if test="search_delivery_count != null and search_delivery_count !=''">
+				AND h.delivery_count = #{search_delivery_count}
+			</if>
+			<if test="search_zone_code != null and search_zone_code !=''">
+				AND h.zone_code = #{search_zone_code}
+			</if>
+			<!-- <if test="search_condition_type != null and search_condition_type !=''">
+			    <if test="search_condition_type == 'short_order_no'">
+				AND h.short_order_no LIKE concat('%',#{search_short_order_no},'%')
+				</if>
+			    <if test="search_condition_type == 'worker_id'">
+				AND getWorkerIdToName(h.worker_id) LIKE concat('%',#{search_short_order_no},'%')
+				</if>
+			    <if test="search_condition_type == 'goods_name'">
+				AND d.goods_name LIKE concat('%',#{search_short_order_no},'%')
+				</if>
+			</if> -->
+		            ) AS a
+		    ORDER BY a.short_order_no) AS b 
+	</select>
+
+
+	<!-- 
+		현황판 통계 정보
+		 누계
+		 최근차수 주문
+		 진척률
+		 피킹 대기
+		 피킹 지시
+		 피킹 완료
+	 -->
+	<select id="selectJobTotalInfo" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		
+		SELECT 
+		    COUNT(short_order_no) AS 'count'
+		FROM
+		    (SELECT 
+		        short_order_no
+		    FROM
+		        tb_pick_h
+		    WHERE 1 = 1 
+		    <if test="search_delivery_date != null and search_delivery_date !=''">
+				AND delivery_date = #{search_delivery_date}
+			</if>
+		    GROUP BY delivery_date , delivery_count , short_order_no) list 
+		UNION ALL 
+		SELECT 
+		    COUNT(short_order_no) AS 'count'
+		FROM
+		    (SELECT 
+		        short_order_no
+		    FROM
+		        tb_pick_h
+		    WHERE 1 = 1 
+		    <if test="search_delivery_date != null and search_delivery_date !=''">
+				AND delivery_date = #{search_delivery_date}
+			</if>
+			<if test="search_delivery_count != null and search_delivery_count !=''">
+				AND delivery_count = #{search_delivery_count}
+			</if>
+		    GROUP BY delivery_date , delivery_count , short_order_no) list 
+		UNION ALL 
+		SELECT 
+			ROUND(IFNULL((COUNT(CASE org_cnt = cur_cnt
+		                        WHEN  1 THEN 0
+		                    END) / COUNT(short_order_no)) * 100,
+		                    0),
+		            0) AS 'count'
+		FROM
+		(SELECT 
+		        short_order_no,
+		            COUNT(short_order_no) org_cnt,
+		            COUNT(CASE state_code
+		                WHEN 2 THEN 1
+		            END) cur_cnt
+		    FROM
+		        tb_pick_h
+		    WHERE 1 = 1
+		    <if test="search_delivery_date != null and search_delivery_date !=''">
+				AND delivery_date = #{search_delivery_date}
+			</if>
+			<if test="search_delivery_count != null and search_delivery_count !=''">
+				AND delivery_count = #{search_delivery_count}
+			</if>
+		    GROUP BY delivery_date , delivery_count , short_order_no) list 
+		UNION ALL
+		SELECT 
+		    COUNT(short_order_no) AS 'count'
+		FROM
+		    (SELECT 
+		        short_order_no,
+		            COUNT(short_order_no) org_cnt,
+            		COUNT(CASE WHEN  start_pick_date is null AND end_pick_date is null THEN 1 END) cur_cnt
+		    FROM
+		        tb_pick_h
+		    WHERE 1 = 1
+		    <if test="search_delivery_date != null and search_delivery_date !=''">
+				AND delivery_date = #{search_delivery_date}
+			</if>
+			<if test="search_delivery_count != null and search_delivery_count !=''">
+				AND delivery_count = #{search_delivery_count}
+			</if>
+		    GROUP BY delivery_date , delivery_count , short_order_no) list 
+		WHERE
+		    org_cnt = cur_cnt
+		UNION ALL
+		SELECT 
+		    COUNT(short_order_no) AS 'count'
+		FROM
+		    (SELECT 
+		        short_order_no,
+		            COUNT(short_order_no) org_cnt,
+		            COUNT(CASE state_code WHEN 2 THEN 1 END) cur_cnt,
+		            COUNT(CASE 
+									WHEN start_pick_date is not null AND end_pick_date is null THEN 1
+								END
+						) start_cnt
+		    FROM
+		        tb_pick_h
+		    WHERE 1 = 1 
+		    <if test="search_delivery_date != null and search_delivery_date !=''">
+				AND delivery_date = #{search_delivery_date}
+			</if>
+			<if test="search_delivery_count != null and search_delivery_count !=''">
+				AND delivery_count = #{search_delivery_count}
+			</if>
+		    GROUP BY delivery_date , delivery_count , short_order_no) list
+		WHERE
+  			start_cnt > 0
+			OR
+				(org_cnt != cur_cnt AND cur_cnt != 0)
+		UNION ALL
+		SELECT 
+		    COUNT(short_order_no) AS 'count'
+		FROM
+		    (SELECT 
+		        	short_order_no
+		            , COUNT(short_order_no) org_cnt
+		            , COUNT(CASE state_code WHEN 2 THEN 1 END) cur_cnt
+		    FROM
+		        tb_pick_h
+		    WHERE 1 = 1
+		    <if test="search_delivery_date != null and search_delivery_date !=''">
+				AND delivery_date = #{search_delivery_date}
+			</if>
+			<if test="search_delivery_count != null and search_delivery_count !=''">
+				AND delivery_count = #{search_delivery_count}
+			</if>
+		    GROUP BY delivery_date , delivery_count , short_order_no) list
+		WHERE
+		    org_cnt = cur_cnt
+	</select>
+
+	<!-- 현황판 현황 목록 -->
+	<select id="selectJobStateList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT 
+		    short_order_no
+		    , substring(order_customer_name, 1, 8) as order_customer_name
+		    , delivery_area_name
+		    , end_time
+		    , org_item_qty
+		    , org_qty
+		    , pick_item_qty
+		    , pick_qty
+		FROM
+		    (SELECT 
+		        	h.short_order_no
+		            , h.order_customer_name
+		            , h.delivery_area_name
+		            , DATE_FORMAT(MAX(end_pick_date), '%Y/%m/%d %H:%i') AS end_time
+		            , (SELECT 
+		                    COUNT(d.goods_code)
+		                FROM
+		                    tb_pick_h sh
+		                JOIN tb_pick_d d ON sh.pick_id = d.pick_id
+		                WHERE
+		                    delivery_date = h.delivery_date
+		                        AND delivery_count = h.delivery_count
+		                        AND short_order_no = h.short_order_no
+		                GROUP BY h.short_order_no , h.order_customer_name , h.delivery_area_name) AS org_item_qty
+		            , SUM(order_qty) AS org_qty
+		            , COUNT(CASE WHEN d.pick_qty > 0 THEN 1 END) AS pick_item_qty
+		            , SUM(pick_qty) AS pick_qty
+            		, COUNT(d.state_code) AS pick_item_tot_qty		            
+		    FROM
+		        tb_pick_h h
+		    JOIN tb_pick_d d ON h.pick_id = d.pick_id
+		    WHERE h.state_code = '2'
+			<if test="search_delivery_date != null and search_delivery_date !=''">
+				AND delivery_date = #{search_delivery_date}
+			</if>
+			<if test="search_delivery_count != null and search_delivery_count !=''">
+				AND delivery_count = #{search_delivery_count}
+			</if>
+		    GROUP BY h.short_order_no, h.order_customer_name, h.delivery_area_name) state_list
+		WHERE
+		    org_item_qty = pick_item_tot_qty
+		ORDER BY end_time
+	</select>
+
+
+	<!-- 결품현황 목록 조회
+	 	20161024 엑셀데이터 임포트 컬럼 추가 (전시카테고리(대):category_large / 전시카테고리(중):category_middle)
+		20161025 데이터 추가 ( 제조사:maker_name, 규격:goods_spec)	 	
+	-->
+	<select id="selectReasonStateList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT   
+		   *
+		FROM
+		    (SELECT 
+		        a.*,
+		            @rownum:=@rownum + 1 AS row_number
+		    FROM
+		        (SELECT 
+		        h.delivery_date,
+		            h.delivery_count,
+		            h.short_order_no,
+		            h.delivery_area_name,
+		            h.customer_name,
+		            h.zone_code,
+		            d.pick_id,
+		            d.pick_row_no,
+		            GETSTORECUTGOODSCODE(d.goods_code) AS 'goods_code',
+		            d.sales_goods_code,
+		            d.goods_name,
+		            d.order_qty,
+		            d.maker_name,
+		            d.goods_spec,
+		            d.pick_qty,
+		            d.change_allow_yn,
+		            d.change_goods_code,
+		            d.change_goods_name,
+		            d.change_pick_qty,
+		            d.state_code,
+		            d.create_user_id,
+		            DATE_FORMAT(d.create_date, '%Y/%m/%d') AS 'create_date',
+		            d.update_user_id,
+		            DATE_FORMAT(d.update_date, '%Y/%m/%d') AS 'update_date',
+		            d.order_cost,
+		            GETSOLDOUTREASONCODETONAME(d.sold_out_reason) AS 'sold_out_reason',
+		            d.change_goods_cost,
+		            d.order_qty - d.pick_qty AS 'reason_qty',
+		            d.category_large,
+		            d.category_middle,
+		            IFNULL(h.worker_id, '') AS 'worker_id',
+		            d.tax_type,
+		            IFNULL(c.com_name, '') AS com_name
+		            
+		    FROM
+		        tb_pick_h h
+		    LEFT JOIN tb_pick_d d ON h.pick_id = d.pick_id
+            LEFT JOIN tb_com_code c ON
+            (
+				c.com_group_code = 'WORKER_ID'
+				AND h.worker_id = c.com_code
+            )
+		    JOIN (SELECT @rownum:=0) R
+		    WHERE
+		        d.state_code = '2'
+		            AND (d.sold_out_reason IS NOT NULL
+		            OR d.change_pick_qty > 0)
+  				<if test="search_delivery_date != null and search_delivery_date !=''">
+					AND h.delivery_date = #{search_delivery_date}
+				</if>
+				<if test="search_delivery_count != null and search_delivery_count !=''">
+					AND h.delivery_count = #{search_delivery_count}
+				</if>
+				<if test="search_zone_code != null and search_zone_code !=''">
+					AND h.zone_code = #{search_zone_code}
+				</if>
+				<!-- <if test="search_condition_type != null and search_condition_type !=''">
+				    <if test="search_condition_type == 'short_order_no'">
+					AND h.short_order_no LIKE concat('%',#{search_short_order_no},'%')
+					</if>
+				    <if test="search_condition_type == 'worker_id'">
+					AND getWorkerIdToName(h.worker_id) LIKE concat('%',#{search_short_order_no},'%')
+					</if>
+				    <if test="search_condition_type == 'goods_name'">
+					AND d.goods_name LIKE concat('%',#{search_short_order_no},'%')
+					</if>
+				</if>        -->
+		            ) AS a
+		    ORDER BY a.short_order_no) AS b		
+	</select>
+	
+	<!-- 피킹 결과 목록 조회
+	-->
+	<select id="selectPickingResultList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT   
+		   *
+		FROM
+		    (SELECT 
+		        a.*,
+		            @rownum:=@rownum + 1 AS row_number
+		    FROM
+		        (SELECT
+		        	h.order_date,
+		        	h.order_no,
+		        	d.order_row_no,
+                    GETSTORECUTGOODSCODE(d.goods_code) AS 'goods_code',
+                    d.goods_name,
+                    SUM(d.order_qty) AS order_qty,
+                    d.change_allow_yn,
+		        	CASE
+						WHEN SUM(d.order_qty - d.pick_qty + d.change_pick_qty) <![CDATA[>]]>  0  THEN 'Y'
+                        WHEN SUM(d.order_qty - d.pick_qty + d.change_pick_qty) <![CDATA[<=]]> 0  THEN 'N'
+					END AS 'reason_yn',
+		        	MAX(IFNULL(d.sold_out_reason, '')) AS 'sold_out_reason',
+		        	SUM(d.order_qty - d.pick_qty + d.change_pick_qty) AS 'reason_qty',
+                    MAX(IFNULL(d.scan_goods_code, '')) AS 'scan_goods_code',
+                    MAX(d.change_goods_cost) AS change_goods_cost,
+                    SUM(d.change_pick_qty) AS change_pick_qty,
+                    MAX(IFNULL(d.change_goods_name, '')) AS 'change_goods_name',
+                    MAX(IFNULL(d.change_goods_code, '')) AS 'change_goods_code',
+                    MAX(d.pick_id) AS pick_id,
+		            MAX(d.pick_row_no) AS pick_row_no,
+		            MAX(IFNULL(d.goods_weight, '')) AS 'goods_weight',
+		            MAX(IFNULL(d.change_goods_weight, '')) AS 'change_goods_weight'
+		    FROM
+		        tb_pick_h h
+		    LEFT JOIN tb_pick_d d ON h.pick_id = d.pick_id
+		    LEFT JOIN tb_com_code c ON
+            (
+				c.com_group_code = 'WORKER_ID'
+				AND h.worker_id = c.com_code
+            )
+		    JOIN (SELECT @rownum:=0) R
+		    WHERE
+		        d.state_code = '2'
+  				<if test="search_delivery_date != null and search_delivery_date !=''">
+					AND h.delivery_date = #{search_delivery_date}
+				</if>
+				<if test="search_delivery_count != null and search_delivery_count !=''">
+					AND h.delivery_count = #{search_delivery_count}
+				</if>
+				<if test="nCouponOrder != null and nCouponOrder !=''">
+					AND h.order_no NOT IN
+					<foreach collection="nCouponOrder" item="nCouponOrder" separator=","
+						open="(" close=")">
+						'${nCouponOrder}'
+					</foreach>
+				</if>
+				<if test="order_key != null and order_key !=''">
+					AND concat(h.order_date,h.order_no) IN
+					<foreach collection="order_key" item="order_key" separator=","
+						open="(" close=")">
+						'${order_key}'
+					</foreach>
+				</if>
+				GROUP BY h.order_date,
+		        	h.order_no,
+		        	d.order_row_no,
+		        	GETSTORECUTGOODSCODE(d.goods_code) ,
+                    d.goods_name,
+                    d.change_allow_yn
+		            ) AS a
+		    ORDER BY a.pick_id , a.pick_row_no ASC) AS b
+		    ORDER BY b.order_no, b.order_row_no		
+	</select>
+	
+<!-- 	주문건 조회 -->
+	<select id="selectChangePickOrderList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO" resultType="egovMap">
+		SELECT T.ORDER_NO
+				, T.STATE_CODE
+		FROM (
+				SELECT
+					ORDER_DATE 
+					 , ORDER_NO
+					 , SUM(CHANGE_PICK_QTY) 
+					 , MIN(D.STATE_CODE) AS STATE_CODE
+				FROM
+				        tb_pick_h h
+				    LEFT JOIN tb_pick_d d ON h.pick_id = d.pick_id
+				    LEFT JOIN tb_com_code c ON
+		            (
+						c.com_group_code = 'WORKER_ID'
+						AND h.worker_id = c.com_code
+		            )
+		            WHERE 1=1
+				        <if test="nCoupon_yn != null and nCoupon_yn !='' and nCoupon_yn eq 'Y'.toString()">
+				        	AND D.n_coupon_cost > 0
+				        </if>
+		  				<if test="search_delivery_date != null and search_delivery_date !=''">
+							AND h.delivery_date = #{search_delivery_date}
+						</if>
+						<if test="search_delivery_count != null and search_delivery_count !=''">
+							AND h.delivery_count = #{search_delivery_count}
+						</if>
+						<if test="order_key != null and order_key !=''">
+							AND concat(h.order_date,h.order_no) IN
+							<foreach collection="order_key" item="order_key" separator=","
+								open="(" close=")">
+								'${order_key}'
+							</foreach>
+						</if>
+					GROUP BY ORDER_NO, ORDER_DATE
+			) T
+			WHERE T.STATE_CODE = '2'
+	</select>
+	
+	<!-- 공통코드 목록 조회 공통코드테이블 사용 -->
+	<select id="selectALLComCodeList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+			SELECT 
+			    com_group_code
+				, com_code
+			    , com_name
+			    , com_order    
+			    , com_sub_code
+			    , com_desc
+			    , use_yn
+			    , create_user_id
+			    , DATE_FORMAT(create_date,'%Y/%m/%d') as 'create_date'
+			    , update_user_id
+			    , DATE_FORMAT(update_date,'%Y/%m/%d') as 'update_date'			    
+				, com_sub_code
+			FROM  tb_com_code
+			WHERE 1 = 1
+				<if test="search_com_group_code != null and search_com_group_code !=''">
+					AND com_group_code = #{search_com_group_code}
+				</if>
+			ORDER BY com_order, com_name ASC		
+	</select>
+	
+	
+	<!-- 그룹코드 업데이트  -->
+	<update id="updateComCodeGroup" parameterType="egovMap">
+		UPDATE tb_com_code
+		SET com_name = #{comName}
+			, use_yn = #{useYn}
+			, update_user_id = 'SYSTEM'
+			, update_date = now()
+		WHERE com_group_code ='@@'
+			AND com_code = #{comCode}
+	</update>
+		
+	<!-- 그룹코드 등록 -->
+	<insert id="insertComCodeGroup" parameterType="egovMap">
+		INSERT INTO tb_com_code
+		( com_group_code
+			, com_code
+			, com_name
+			, use_yn
+			, create_user_id
+			, create_date
+		)
+		VALUES ( '@@'
+			, #{comCode}
+			, #{comName}
+			, #{useYn}
+			, 'SYSTEM'
+			, NOW()
+		)
+	</insert>		
+	<!-- 코드 업데이트  -->
+	<update id="updateComCode" parameterType="egovMap">
+		UPDATE tb_com_code
+		SET com_name = #{comName}
+			, com_sub_code = #{comSubCode}
+			, com_order = #{comOrder}
+			, com_desc = #{comDesc}
+			, use_yn = #{useYn}
+			, update_user_id = 'SYSTEM'
+			, update_date = now()
+		WHERE com_group_code =#{comGroupCode}
+			AND com_code = #{comCode}
+	</update>
+	
+	
+	<!-- 코드 등록 -->
+	<insert id="insertComCode" parameterType="egovMap">
+		INSERT INTO tb_com_code
+		( com_group_code
+			, com_code
+			, com_name
+			, com_order
+			, com_sub_code
+			, com_desc
+			, use_yn
+			, create_user_id
+			, create_date
+		)
+		VALUES ( #{comGroupCode}
+			, #{comCode}
+			, #{comName}
+			, #{comOrder}
+			, #{comSubCode}
+			, #{comDesc}
+			, #{useYn}
+			, 'SYSTEM'
+			, NOW()
+		)
+	</insert>
+			
+	<!-- 현황판사용 코드 조회 -->
+	<select id="selectJobStateCode"
+		resultType="egovMap">
+		SELECT
+		    MAX(INFO_TIME) AS 'INFO_TIME'
+		    , MAX(ROW_CNT) AS 'ROW_CNT'
+		    , MAX(SKIP_TIME) AS 'SKIP_TIME'
+		    , MAX(STATE_TIME) AS 'STATE_TIME'
+		    , MAX(ROLLING_TIME) AS 'ROLLING_TIME'
+		FROM
+		    (SELECT 
+		        CASE com_code
+		                WHEN 'INFO_TIME' THEN com_sub_code
+		            END AS 'INFO_TIME',
+		            CASE com_code
+		                WHEN 'ROW_CNT' THEN com_sub_code
+		            END AS 'ROW_CNT',
+		            CASE com_code
+		                WHEN 'SKIP_TIME' THEN com_sub_code
+		            END 'SKIP_TIME',
+		            CASE com_code
+		                WHEN 'STATE_TIME' THEN com_sub_code
+		            END 'STATE_TIME',
+		            CASE com_code
+		                WHEN 'ROLLING_TIME' THEN com_sub_code
+		            END 'ROLLING_TIME'
+		    FROM
+		        tb_com_code
+		    WHERE
+		        com_group_code = 'JOB_STATE_CODE'
+		    GROUP BY com_code) codes
+	</select>
+	
+	<!-- 사전피킹리스트 조회 -->
+	<select id="selectPrePckList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="vertexid.nhmarket.pcs.service.ReportPrePckVO">
+		SELECT @ROWNUM := @ROWNUM + 1 AS row,
+				T.*
+		FROM (
+			SELECT 
+			    	h.zone_code
+		            <if test="search_zone_code == null or search_zone_code ==''">
+		            , '전체' AS zone_code_all
+		            </if>
+		            , CASE WHEN h.zone_code IN (SELECT com_code FROM tb_com_code WHERE Com_group_code = 'ZONE_CODE' AND com_sub_code LIKE '1%')
+		    			 THEN IFNULL(h.tel_no_2, h.tel_no_1)
+		    			 ELSE ''
+		    			 END tel
+					, concat(concat(substr(h.delivery_date, 3, 2), '.', substr(h.delivery_date, 5, 2)), '.',substr(h.delivery_date, 7, 2)) AS 'delivery_date'
+		            , h.delivery_count
+		            , h.short_order_no      
+		            , h.customer_name
+		            , h.order_customer_name
+		            , d.goods_code			
+					, d.goods_name
+					, d.goods_option_name
+					, d.goods_spec
+		            , d.order_qty
+					, d.order_cost
+					, h.delivery_area_name
+		            , IF(d.change_allow_yn='Y','수락', '거절') AS 'change_allow_yn'	
+		    	FROM 
+		    		tb_pick_d d LEFT join tb_pick_h h 
+		    	ON
+		    		d.pick_id = h.pick_id
+				WHERE
+					h.delivery_date = DATE_FORMAT(now(),'%Y%m%d')
+				AND
+					h.delivery_count = #{search_delivery_count}
+				<if test="search_zone_code != null and search_zone_code !=''">
+				AND h.zone_code = #{search_zone_code}
+				</if>
+				<if test="search_state_code != null and search_state_code !=''">
+				AND h.state_code != #{search_state_code}
+				</if>
+				ORDER BY
+					h.zone_code
+				  , d.category_large
+	              , d.category_middle
+	              , d.goods_code
+	              , d.goods_name
+	              , h.short_order_no
+              ) T,  (SELECT @ROWNUM := 0) R			        
+	</select>
+	
+	<!-- 프린트 출력 여부 (주문진행현황조회) --> 
+	<select id="selectPrintHeader" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT t4.short_order_no                     AS short_order_no 
+		     , t4.state_code                         AS state_code
+		     , t4.pick_id                            AS pick_id
+		     , t4.delivery_date                      AS delivery_date
+		     , t4.delivery_count                     AS delivery_count
+		     , t4.order_no                           AS order_no
+		     , t4.order_date                         AS order_date
+		     , t4.order_customer_name                AS order_customer_name
+		     , t4.delivery_area_name                 AS delivery_area_name
+<!-- 		     , t4.customer_name                      AS customer_name -->
+<!-- 		     , t4.delivery_message                   AS delivery_message -->
+<!-- 		     , t4.goods_message                      AS goods_message -->
+<!-- 		     , t4.zone_code                          AS zone_code -->
+     		 , IF( (SELECT count(print_id) FROM tb_print p WHERE p.order_no = concat(t4.order_date, t4.order_no) and state='4')>1, '출력', '미출력' ) AS print_yn
+     		 , (select max(change_allow_yn) from tb_pick_d where pick_id=t4.pick_id) as change_allow_yn
+     		 , t3.n_coupon_cost
+     		 , t3.pick_type
+   		FROM (SELECT t1.org_order_no, t1.state_code, t2.pick_id, IFNULL(t1.n_coupon_cost, 0) AS n_coupon_cost, t1.pick_type
+     	FROM     (SELECT concat(c.order_date, c.order_no) as org_order_no
+            , CASE WHEN COUNT(r1)   = SUM(r1)                            THEN '1'
+                   WHEN COUNT(r1)   = SUM(r2)                            THEN '2'
+                   WHEN (COUNT(r1) != SUM(r1) OR COUNT(r1) != SUM(r2))   THEN '1'
+               END state_code
+            , SUM(n_coupon_cost) AS n_coupon_cost
+            , CASE WHEN (sum(c.SOLD_OUT_REASON) IS NOT NULL) AND sum(c.CHANGE_PICK_QTY) > 0 then '대체'
+                	  WHEN (sum(c.SOLD_OUT_REASON) IS NOT NULL) AND sum(c.CHANGE_PICK_QTY) = 0 THEN '결품'
+                      ELSE '정상'
+              END PICK_TYPE
+        FROM (SELECT CASE WHEN @va = concat(a.order_date, a.order_no) THEN @rownum
+                          ELSE @rownum:=@rownum + 1
+                      END AS rn
+                   , CASE WHEN a.state_code = '1'                     THEN @cnt1:=1
+                          ELSE @cnt1:=''
+                      END AS r1
+                   , CASE WHEN a.state_code = '2'                     THEN @cnt2:=1
+                          ELSE @cnt2:=''
+                      END AS r2
+                   , concat(a.order_date, a.order_no)                 AS org_order_no
+                   , a.state_code
+                   , @va:=concat(a.order_date, a.order_no)            AS va
+                   , @vs:=a.state_code                                AS vs
+                   , a.order_date
+                   , a.order_no
+                   , (SELECT SUM(N_COUPON_COST) FROM TB_PICK_D WHERE PICK_ID = A.PICK_ID ) AS n_coupon_cost
+                   , (SELECT max(sold_out_reason) FROM tb_pick_d WHERE  pick_id = A.pick_id) AS sold_out_reason
+                   , (SELECT sum(change_pick_qty) FROM tb_pick_d WHERE  pick_id = A.pick_id) AS change_pick_qty
+        FROM tb_pick_h                                              a
+                   , (SELECT @va:=0, @vs:=0, @rownum:=0, @cnt1:=1, @cnt2:=1) t
+                    WHERE 1=1 <!-- 조회 속도관련 변경 -->
+                <if test="search_delivery_date != null and search_delivery_date !=''"> 
+					AND a.delivery_date = #{search_delivery_date}
+				</if>
+				<if test="search_delivery_count != null and search_delivery_count !=''">
+					AND a.delivery_count = #{search_delivery_count}
+				</if>
+				<if test="search_state_code != null and search_state_code !=''">
+					AND a.state_code = #{search_state_code}
+				</if>
+				<!-- 검색 조건 추가 18-09-12 -->
+				<if test="search_zone_code != null and search_zone_code !=''">
+					AND a.zone_code = #{search_zone_code}
+				</if>
+				<if test="search_short_order_no != null and search_short_order_no !=''">
+					AND a.short_order_no = #{search_short_order_no}
+				</if>
+				<if test="search_delivery_area_name != null and search_delivery_area_name !=''">
+					AND a.delivery_area_name LIKE concat('%',#{search_delivery_area_name},'%')
+				</if>
+				<if test="search_goods_name != null and search_goods_name !=''">
+					AND A.PICK_ID IN (SELECT PICK_ID FROM TB_PICK_D WHERE GOODS_NAME LIKE CONCAT('%',#{search_goods_name},'%'))
+				</if>
+				<if test="search_worker_id != null and search_worker_id !=''">
+					AND getWorkerIdToName(A.WORKER_ID) LIKE concat('%',#{search_worker_id},'%')
+				</if>
+               ORDER BY org_order_no , state_code
+           ) c
+        GROUP BY concat(c.order_date, c.order_no)
+                ) t1
+        INNER JOIN (select concat(s.order_date, s.order_no) as org_order_no, MAX(s.pick_id) pick_id 
+                   from tb_pick_h s 
+                   WHERE 1=1 <!-- 조회 속도관련 변경 -->
+                    <if test="search_delivery_date != null and search_delivery_date !=''">
+						AND s.delivery_date = #{search_delivery_date}
+					</if>
+					<if test="search_delivery_count != null and search_delivery_count !=''">
+						AND s.delivery_count = #{search_delivery_count}
+					</if>
+					<if test="search_state_code != null and search_state_code !=''">
+						AND s.state_code = #{search_state_code}
+					</if>
+					<!-- 검색 조건 추가 18-09-12 -->
+					<if test="search_zone_code != null and search_zone_code !=''">
+						AND s.zone_code = #{search_zone_code}
+					</if>
+					<if test="search_short_order_no != null and search_short_order_no !=''">
+						AND s.short_order_no = #{search_short_order_no}
+					</if>
+					<if test="search_delivery_area_name != null and search_delivery_area_name !=''">
+						AND s.delivery_area_name LIKE concat('%',#{search_delivery_area_name},'%')
+					</if>
+					<if test="search_goods_name != null and search_goods_name !=''">
+						AND S.PICK_ID IN (SELECT PICK_ID FROM TB_PICK_D WHERE GOODS_NAME LIKE CONCAT('%',#{search_goods_name},'%'))
+					</if>
+					<if test="search_worker_id != null and search_worker_id !=''">
+						AND getWorkerIdToName(S.WORKER_ID) LIKE concat('%',#{search_worker_id},'%')
+					</if>
+        group by concat(s.order_date, s.order_no)
+        ) t2
+             ON t1.org_order_no = t2.org_order_no
+                           ) t3         
+        INNER JOIN tb_pick_h t4
+                on t3.pick_id = t4.pick_id
+                
+        WHERE 1 = 1
+        
+        <!-- 조회 속도관련 변경 -->
+<!-- 		<if test="search_delivery_date != null and search_delivery_date !=''"> -->
+<!-- 			AND t4.delivery_date = #{search_delivery_date} -->
+<!-- 		</if> -->
+<!-- 		<if test="search_delivery_count != null and search_delivery_count !=''"> -->
+<!-- 			AND t4.delivery_count = #{search_delivery_count} -->
+<!-- 		</if> -->
+<!-- 		<if test="search_state_code != null and search_state_code !=''"> -->
+<!-- 			AND t4.state_code = #{search_state_code} -->
+<!-- 		</if> -->
+<!-- 		<if test="search_order_date != null and search_order_date !=''"> -->
+<!-- 			AND t4.order_date = #{search_order_date} -->
+<!-- 		</if> -->
+<!-- 		<if test="search_order_no != null and search_order_no !=''"> -->
+<!-- 			AND t4.order_no = #{search_order_no} -->
+<!-- 		</if> -->
+<!-- 		<if test="search_short_order_no != null and search_short_order_no !=''"> -->
+<!-- 			AND t4.short_order_no = #{search_short_order_no} -->
+<!-- 		</if> -->
+		<!-- 검색 조건 추가 18-09-12 -->
+		<if test="nCoupon_yn != null and nCoupon_yn !='' and nCoupon_yn eq 'Y'.toString()">
+			AND t3.n_coupon_cost <![CDATA[>]]> 0
+		</if>
+		<if test="nCoupon_yn != null and nCoupon_yn !='' and nCoupon_yn eq 'N'.toString()">
+			AND t3.n_coupon_cost = 0
+		</if>
+		ORDER BY delivery_count, short_order_no
+<!-- 		 order_date, order_no 180803 순서변경 -->
+	</select>
+	
+	<!-- 미출력된 주문건(주문날짜+주문순번) 가져오기 -->
+<!-- 	<select id="selectOrgOrderNoPrint" resultType="vertexid.nhmarket.pcs.service.PickHeaderVO"> -->
+<!-- 				 select t.order_date, t.order_no FROM (  -->
+<!-- 		SELECT  -->
+<!-- 		    t4.short_order_no AS short_order_no, -->
+<!-- 		    t4.state_code AS state_code, -->
+<!-- 		    t4.pick_id AS pick_id, -->
+<!-- 		    t4.delivery_date AS delivery_date, -->
+<!-- 		    t4.delivery_count AS delivery_count, -->
+<!-- 		    t4.order_no AS order_no, -->
+<!-- 		    t4.order_date AS order_date, -->
+<!-- 		    t4.order_customer_name AS order_customer_name, -->
+<!-- 		    t4.delivery_area_name AS delivery_area_name, -->
+<!-- 		    t4.customer_name AS customer_name, -->
+<!-- 		    t4.delivery_message AS delivery_message, -->
+<!-- 		    t4.goods_message AS goods_message, -->
+<!-- 		    t4.print_yn AS print_yn -->
+<!-- 		FROM -->
+<!-- 		    (SELECT  -->
+<!-- 		        t1.org_order_no, t1.state_code, t2.pick_id -->
+<!-- 		    FROM -->
+<!-- 		        (SELECT  -->
+<!-- 		        CONCAT(c.order_date, c.order_no) AS org_order_no, -->
+<!-- 		            CASE -->
+<!-- 		                WHEN COUNT(r1) = SUM(r1) THEN '1' -->
+<!-- 		                WHEN COUNT(r1) = SUM(r2) THEN '2' -->
+<!-- 		                WHEN -->
+<!-- 		                    (COUNT(r1) != SUM(r1) -->
+<!-- 		                        OR COUNT(r1) != SUM(r2)) -->
+<!-- 		                THEN -->
+<!-- 		                    '1' -->
+<!-- 		            END state_code -->
+<!-- 		    FROM -->
+<!-- 		        (SELECT  -->
+<!-- 		        CASE -->
+<!-- 		                WHEN @va = CONCAT(a.order_date, a.order_no) THEN @rownum -->
+<!-- 		                ELSE @rownum:=@rownum + 1 -->
+<!-- 		            END AS rn, -->
+<!-- 		            CASE -->
+<!-- 		                WHEN a.state_code = '1' THEN @cnt1:=1 -->
+<!-- 		                ELSE @cnt1:='' -->
+<!-- 		            END AS r1, -->
+<!-- 		            CASE -->
+<!-- 		                WHEN a.state_code = '2' THEN @cnt2:=1 -->
+<!-- 		                ELSE @cnt2:='' -->
+<!-- 		            END AS r2, -->
+<!-- 		            CONCAT(a.order_date, a.order_no) AS org_order_no, -->
+<!-- 		            a.state_code, -->
+<!-- 		            @va:=CONCAT(a.order_date, a.order_no) AS va, -->
+<!-- 		            @vs:=a.state_code AS vs, -->
+<!-- 		            a.order_date, -->
+<!-- 		            a.order_no -->
+<!-- 		    FROM -->
+<!-- 		        tb_pick_h a, (SELECT @va:=0, @vs:=0, @rownum:=0, @cnt1:=1, @cnt2:=1) t -->
+<!-- 		    ORDER BY org_order_no , state_code) c -->
+<!-- 		    GROUP BY CONCAT(c.order_date, c.order_no)) t1 -->
+<!-- 		    INNER JOIN (SELECT  -->
+<!-- 		        CONCAT(s.order_date, s.order_no) AS org_order_no, -->
+<!-- 		            MAX(s.pick_id) pick_id -->
+<!-- 		    FROM -->
+<!-- 		        tb_pick_h s -->
+<!-- 		    GROUP BY CONCAT(s.order_date, s.order_no)) t2 ON t1.org_order_no = t2.org_order_no) t3 -->
+<!-- 		        INNER JOIN -->
+<!-- 		    tb_pick_h t4 ON t3.pick_id = t4.pick_id -->
+<!-- 		WHERE -->
+<!-- 		    1 = 1 AND t4.delivery_date   = DATE_FORMAT(NOW(), '%Y%m%d') -->
+<!-- 		ORDER BY delivery_count , order_date , order_no) t -->
+<!-- 		where t.state_code = 2 -->
+<!-- 		and t.print_yn = 'N' -->
+			
+<!-- 				select w.order_no, w.order_date, w.state_code, w.end_pick_date -->
+<!-- 	  from ( -->
+<!-- 				select t.order_no, t.order_date, t.end_pick_date -->
+<!-- 				     , case when count(rn) = sum(r2) then '2' -->
+<!-- 				            when count(rn) = sum(r1) then '1' -->
+<!-- 				            when (count(rn) != sum(r1) or count(rn) != sum(r2)) then '1' -->
+<!-- 				       end as state_code -->
+<!-- 				from (select h.order_no, h.order_date, d.state_code, h.end_pick_date -->
+<!-- 						      , case when @v_order_date = h.order_date and @v_order_no = h.order_no then @rownum -->
+<!-- 						             else @rownum:= @rownum + 1 -->
+<!-- 						        end as rn -->
+<!-- 						       , case when d.state_code = '1' then @cnt1:=1 -->
+<!-- 						              else @cnt1:=0 -->
+<!-- 						         end as r1 -->
+<!-- 						       , case when d.state_code = '2' then @cnt2:=1 -->
+<!-- 						              else @cnt2:=0 -->
+<!-- 						         end as r2 -->
+<!-- 						       , case when @v_order_date = h.order_date and @v_order_no = h.order_no then @rowcnt:=@rowcnt+1 -->
+<!-- 						             else @rowcnt:=1 -->
+<!-- 						        end as rowcnt -->
+<!-- 						      , @v_order_date := h.order_date  as v_order_date -->
+<!-- 						      , @v_order_no   := h.order_no    as v_order_no						         -->
+<!-- 						  from       tb_pick_h h -->
+<!-- 						  inner join tb_pick_d d -->
+<!-- 						          on h.pick_id = d.pick_id -->
+<!-- 						          , (SELECT @v_order_date:='', @v_order_no:='', @v_pick_id:='',@rownum:=0, @cnt1:=1, @cnt2:=1, @rowcnt:=0) p -->
+<!-- 						 where 1=1 -->
+<!-- 						   and h.delivery_date = date_format(now(), '%Y%m%d') -->
+<!-- 	  			 	       and h.print_yn      = 'N' -->
+<!-- 						order by h.end_pick_date, h.order_no, h.order_date -->
+<!-- 				) t -->
+<!-- 				group by order_no, order_date -->
+<!-- 				order by end_pick_date, order_no, order_date, state_code -->
+<!-- 				) w -->
+<!-- 	where w.state_code = '2' -->
+<!-- 	order by w.end_pick_date, w.order_no, w.order_date -->
+<!-- 	limit 1 -->
+<!-- 	</select> -->
+	
+	<!-- 자동 프린트 완료 여부  -->
+<!-- 	<select id="selectHeaderCompletePrint" parameterType="egovMap" resultType="java.lang.Integer">			 -->
+<!-- 			 SELECT  -->
+<!-- 		     	count(pick_id) -->
+<!-- 		  	 FROM -->
+<!-- 		        tb_pick_h -->
+<!-- 		 	 WHERE -->
+<!-- 		  	 	  order_date = #{order_date} -->
+<!-- 			 AND  order_no   = #{order_no} -->
+<!-- 		 	 GROUP BY order_date, order_no -->
+<!--    		SELECT  -->
+<!-- 		    COUNT(short_order_no) AS 'count' -->
+<!-- 		FROM -->
+<!-- 		    (SELECT  -->
+<!-- 		        	short_order_no -->
+<!-- 		            , COUNT(short_order_no) org_cnt -->
+<!-- 		            , COUNT(CASE state_code WHEN 2 THEN 1 END) cur_cnt -->
+<!-- 		    FROM -->
+<!-- 		        tb_pick_h -->
+<!-- 		    WHERE  -->
+<!-- 				 order_date = #{order_date} -->
+<!-- 			AND  order_no   = #{order_no} -->
+				 
+<!-- 		    GROUP BY delivery_date , delivery_count , short_order_no) list -->
+<!-- 		WHERE -->
+<!-- 		    org_cnt = cur_cnt -->
+
+	
+<!-- 	</select> -->
+	
+	<!-- 다음 차수 가져오기 -->
+	<select id="nextDeliveryCountList" parameterType="vertexid.nhmarket.pcs.service.DefaultVO"
+		resultType="egovMap">
+		SELECT IFNULL(max(delivery_count),0) + 1 AS delivery_count
+		FROM tb_order
+		WHERE delivery_date = #{search_delivery_date}
+		AND state_code != '0'
+	</select>
+	
+	<!-- 이전의 주문 정보 존재 여부 체크  -->
+	<select id="checkOrderInfo" parameterType="vertexid.nhmarket.pcs.service.OrderVO" resultType="java.lang.Integer">
+		SELECT 
+		    IFNULL(count(delivery_date), 0) AS 'cnt'
+		FROM
+		    tb_order
+		WHERE		    
+			order_date      = #{order_date}
+		AND order_no        = #{order_no}
+		AND delivery_date   = DATE_FORMAT(NOW(), '%Y%m%d')
+		AND delivery_count != #{delivery_count}
+	</select>
+	
+</mapper>

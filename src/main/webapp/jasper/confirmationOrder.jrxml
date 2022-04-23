@@ -1,0 +1,964 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="주문확인서" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9f7d3460-12f3-456a-94c9-f8c62b23d853">
+	<property name="ireport.zoom" value="1.771561000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="768"/>
+	<style name="rowcolor">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{row종류}.equals( "2" )]]></conditionExpression>
+			<style mode="Opaque" forecolor="#000000" backcolor="#CCCCCC" fill="Solid" scaleImage="FillFrame" markup="none" pattern="" fontSize="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H">
+				<pen lineColor="#000000"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{row종류}.equals( "4" )]]></conditionExpression>
+			<style mode="Opaque" forecolor="#000000" backcolor="#CCCCCC" fill="Solid" scaleImage="FillFrame" markup="none" pattern="" fontSize="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H">
+				<pen lineColor="#000000"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+			</style>
+		</conditionalStyle>
+	</style>
+	<style name="cellcolor" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{row종류}.equalsIgnoreCase( "2" )]]></conditionExpression>
+			<style mode="Opaque" forecolor="#000000" backcolor="#CCCCCC" fill="Solid" scaleImage="FillFrame" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{row종류}.equalsIgnoreCase( "3" )]]></conditionExpression>
+			<style mode="Opaque" forecolor="#000000" backcolor="#CCCCCC" fill="Solid" scaleImage="FillFrame" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{row종류}.equalsIgnoreCase( "4" )]]></conditionExpression>
+			<style mode="Opaque" forecolor="#000000" backcolor="#CCCCCC" fill="Solid" scaleImage="FillFrame" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{row종류}.equalsIgnoreCase( "5" )]]></conditionExpression>
+			<style mode="Opaque" forecolor="#000000" backcolor="#CCCCCC" fill="Solid" scaleImage="FillFrame" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H"/>
+		</conditionalStyle>
+	</style>
+	<style name="costcolor" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{row종류}.equalsIgnoreCase( "2" )]]></conditionExpression>
+			<style mode="Opaque" forecolor="#000000" backcolor="#CCCCCC" fill="Solid" scaleImage="FillFrame" fontSize="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{row종류}.equalsIgnoreCase( "4" )]]></conditionExpression>
+			<style mode="Opaque" forecolor="#000000" backcolor="#CCCCCC" fill="Solid" scaleImage="FillFrame" fontSize="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{밑줄}.equalsIgnoreCase( "6" )]]></conditionExpression>
+			<style mode="Opaque" forecolor="#000000" backcolor="#FFFFFF" fill="Solid" scaleImage="FillFrame" fontSize="10" isBold="false" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H"/>
+		</conditionalStyle>
+	</style>
+	<subDataset name="dataset1" uuid="3594190c-0a1d-4e87-aa8f-1666a132df89"/>
+	<parameter name="short_order_no" class="java.lang.String">
+		<parameterDescription><![CDATA[단축주문번호]]></parameterDescription>
+	</parameter>
+	<parameter name="delivery_area_name" class="java.lang.String">
+		<parameterDescription><![CDATA[배송구명]]></parameterDescription>
+	</parameter>
+	<parameter name="order_customer_name" class="java.lang.String">
+		<parameterDescription><![CDATA[받는고객]]></parameterDescription>
+	</parameter>
+	<parameter name="order_date" class="java.lang.String">
+		<parameterDescription><![CDATA[배송요청일시]]></parameterDescription>
+	</parameter>
+	<parameter name="org_order_no" class="java.lang.String">
+		<parameterDescription><![CDATA[주문번호]]></parameterDescription>
+	</parameter>
+	<parameter name="customer_name" class="java.lang.String">
+		<parameterDescription><![CDATA[받는고객]]></parameterDescription>
+	</parameter>
+	<parameter name="tel_no_1" class="java.lang.String">
+		<parameterDescription><![CDATA[연락처1]]></parameterDescription>
+	</parameter>
+	<parameter name="tel_no_2" class="java.lang.String">
+		<parameterDescription><![CDATA[연락처2]]></parameterDescription>
+	</parameter>
+	<parameter name="address" class="java.lang.String">
+		<parameterDescription><![CDATA[배송주소]]></parameterDescription>
+	</parameter>
+	<parameter name="delivery_message" class="java.lang.String">
+		<parameterDescription><![CDATA[배송메세지]]></parameterDescription>
+	</parameter>
+	<parameter name="change_allow_yn" class="java.lang.String">
+		<parameterDescription><![CDATA[대체여부]]></parameterDescription>
+	</parameter>
+	<parameter name="free_gift_name" class="java.lang.String">
+		<parameterDescription><![CDATA[사은품]]></parameterDescription>
+	</parameter>
+	<parameter name="order_cost" class="java.lang.String">
+		<parameterDescription><![CDATA[판매단가]]></parameterDescription>
+	</parameter>
+	<parameter name="order_qty" class="java.lang.String">
+		<parameterDescription><![CDATA[주문수량]]></parameterDescription>
+	</parameter>
+	<parameter name="pick_qty" class="java.lang.String">
+		<parameterDescription><![CDATA[배송]]></parameterDescription>
+	</parameter>
+	<parameter name="order_cost_sum" class="java.lang.String">
+		<parameterDescription><![CDATA[주문합계]]></parameterDescription>
+	</parameter>
+	<parameter name="pos_cost_sum" class="java.lang.String">
+		<parameterDescription><![CDATA[POS외상매출합계]]></parameterDescription>
+	</parameter>
+	<parameter name="order_qty_sum" class="java.lang.String">
+		<parameterDescription><![CDATA[주문수량합계]]></parameterDescription>
+	</parameter>
+	<parameter name="sold_out_qty_sum" class="java.lang.String">
+		<parameterDescription><![CDATA[결품수량]]></parameterDescription>
+	</parameter>
+	<parameter name="change_pick_qty_sum" class="java.lang.String">
+		<parameterDescription><![CDATA[대체수량합계]]></parameterDescription>
+	</parameter>
+	<parameter name="pick_qty_sum" class="java.lang.String">
+		<parameterDescription><![CDATA[배송수량]]></parameterDescription>
+	</parameter>
+	<parameter name="etc" class="java.lang.String">
+		<parameterDescription><![CDATA[기타]]></parameterDescription>
+	</parameter>
+	<parameter name="sold_out_cost_sum" class="java.lang.String">
+		<parameterDescription><![CDATA[결품합계]]></parameterDescription>
+	</parameter>
+	<parameter name="min_sum" class="java.lang.String">
+		<parameterDescription><![CDATA[대체차액합계]]></parameterDescription>
+	</parameter>
+	<parameter name="spc_knd" class="java.lang.String">
+		<parameterDescription><![CDATA[거래명세서종류]]></parameterDescription>
+	</parameter>
+	<parameter name="goods_name" class="java.lang.String">
+		<parameterDescription><![CDATA[상품명]]></parameterDescription>
+	</parameter>
+	<parameter name="change_pick_qty" class="java.lang.String">
+		<parameterDescription><![CDATA[대체]]></parameterDescription>
+	</parameter>
+	<parameter name="lck_knd" class="java.lang.String">
+		<parameterDescription><![CDATA[row종류]]></parameterDescription>
+	</parameter>
+	<parameter name="row" class="java.lang.String">
+		<parameterDescription><![CDATA[순번]]></parameterDescription>
+	</parameter>
+	<parameter name="order_cost_total" class="java.lang.String">
+		<parameterDescription><![CDATA[금액]]></parameterDescription>
+	</parameter>
+	<parameter name="sold_out_qty" class="java.lang.String">
+		<parameterDescription><![CDATA[결품]]></parameterDescription>
+	</parameter>
+	<parameter name="goods_code" class="java.lang.String">
+		<parameterDescription><![CDATA[상품코드]]></parameterDescription>
+	</parameter>
+	<parameter name="delivery_amount" class="java.lang.String">
+		<parameterDescription><![CDATA[배송비]]></parameterDescription>
+	</parameter>
+	<parameter name="rootPath" class="java.lang.String">
+		<parameterDescription><![CDATA[파일경로]]></parameterDescription>
+	</parameter>
+	<parameter name="under_line" class="java.lang.String">
+		<parameterDescription><![CDATA[밑줄]]></parameterDescription>
+	</parameter>
+	<parameter name="pay_method" class="java.lang.String"/>
+	<parameter name="order_pay_sum" class="java.lang.String">
+		<parameterDescription><![CDATA[주문금액합계]]></parameterDescription>
+	</parameter>
+	<parameter name="delivery_pay_sum" class="java.lang.String">
+		<parameterDescription><![CDATA[배송비합계]]></parameterDescription>
+	</parameter>
+	<parameter name="card_dc_sum" class="java.lang.String">
+		<parameterDescription><![CDATA[카드즉시할인합계]]></parameterDescription>
+	</parameter>
+	<parameter name="e_pay_cost" class="java.lang.String">
+		<parameterDescription><![CDATA[e-주문금액]]></parameterDescription>
+	</parameter>
+	<parameter name="dlvry_pay_cost" class="java.lang.String">
+		<parameterDescription><![CDATA[택배주문금액]]></parameterDescription>
+	</parameter>
+	<parameter name="e_sent_fee" class="java.lang.String">
+		<parameterDescription><![CDATA[e-배송비]]></parameterDescription>
+	</parameter>
+	<parameter name="dlvry_sent_fee" class="java.lang.String">
+		<parameterDescription><![CDATA[택배배송비]]></parameterDescription>
+	</parameter>
+	<parameter name="e_card_dc" class="java.lang.String">
+		<parameterDescription><![CDATA[e-카드즉시할인]]></parameterDescription>
+	</parameter>
+	<parameter name="dlvry_card_dc" class="java.lang.String">
+		<parameterDescription><![CDATA[택배카드즉시할인]]></parameterDescription>
+	</parameter>
+	<parameter name="coupon_dc" class="java.lang.String">
+		<parameterDescription><![CDATA[쿠폰할인]]></parameterDescription>
+	</parameter>
+	<parameter name="pay_cost" class="java.lang.String">
+		<parameterDescription><![CDATA[결제금액]]></parameterDescription>
+	</parameter>
+	<parameter name="cancel_addr" class="java.lang.String">
+		<parameterDescription><![CDATA[반품주소]]></parameterDescription>
+	</parameter>
+	<parameter name="custom_center" class="java.lang.String">
+		<parameterDescription><![CDATA[고객센터]]></parameterDescription>
+	</parameter>
+	<parameter name="promotion_name" class="java.lang.String">
+		<parameterDescription><![CDATA[프로모션명]]></parameterDescription>
+	</parameter>
+	<parameter name="delivery_count" class="java.lang.String">
+		<parameterDescription><![CDATA[배송차수]]></parameterDescription>
+	</parameter>
+	<parameter name="goods_message" class="java.lang.String">
+		<parameterDescription><![CDATA[상품메세지]]></parameterDescription>
+	</parameter>
+	<field name="순번" class="java.lang.String">
+		<fieldDescription><![CDATA[row]]></fieldDescription>
+	</field>
+	<field name="상품명" class="java.lang.String">
+		<fieldDescription><![CDATA[goods_name]]></fieldDescription>
+	</field>
+	<field name="판매단가" class="java.lang.String">
+		<fieldDescription><![CDATA[order_cost]]></fieldDescription>
+	</field>
+	<field name="주문수량" class="java.lang.String">
+		<fieldDescription><![CDATA[order_qty]]></fieldDescription>
+	</field>
+	<field name="대체수량" class="java.lang.String">
+		<fieldDescription><![CDATA[change_pick_qty]]></fieldDescription>
+	</field>
+	<field name="금액" class="java.lang.String">
+		<fieldDescription><![CDATA[order_cost_total]]></fieldDescription>
+	</field>
+	<field name="결품" class="java.lang.String">
+		<fieldDescription><![CDATA[sold_out_qty]]></fieldDescription>
+	</field>
+	<field name="배송" class="java.lang.String">
+		<fieldDescription><![CDATA[pick_qty]]></fieldDescription>
+	</field>
+	<field name="상품코드" class="java.lang.String">
+		<fieldDescription><![CDATA[goods_code]]></fieldDescription>
+	</field>
+	<field name="row종류" class="java.lang.String">
+		<fieldDescription><![CDATA[lck_knd]]></fieldDescription>
+	</field>
+	<field name="밑줄" class="java.lang.String">
+		<fieldDescription><![CDATA[under_line]]></fieldDescription>
+	</field>
+	<field name="프로모션명" class="java.lang.String">
+		<fieldDescription><![CDATA[promotion_name]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="328" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="93" width="554" height="159" uuid="cc5bbc7a-d653-40d0-b274-16fc4c99d12d"/>
+				<graphicElement>
+					<pen lineWidth="1.5"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="1" width="555" height="50" uuid="e61dd430-7ded-49c9-a587-fada3cf7094f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="20" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[주문확인서]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="450" y="18" width="105" height="32" uuid="e38c0a77-de55-485f-978c-61dab784a7ff"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{delivery_area_name}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="408" y="18" width="31" height="32" uuid="98c3db55-7cf2-4c7b-ac6c-f092e2b43ba3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="15" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{short_order_no}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="53" width="128" height="40" uuid="f2930f70-b295-4b44-9e1f-b671887dff5b"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="17" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[주문/배송정보]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="103" width="74" height="17" uuid="5fd8b416-c048-4c34-856c-4eb20ee82039"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[주문고객]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="136" width="74" height="17" uuid="f196cc94-1af6-4fdf-ad2b-bd036246a09b"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[받는고객]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="11" y="170" width="74" height="17" uuid="a1d09649-8c28-4775-aee8-36a2c37e9c70"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[배송주소]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="200" width="74" height="16" uuid="091d18a9-5071-4847-b4d7-0282767570bd"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[배송메시지
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="165" y="103" width="62" height="17" uuid="e7e6faab-c244-4927-8830-ca1bd7a9288c"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[주문번호]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="165" y="136" width="62" height="17" uuid="c66c9ce5-35a6-4b48-a4a2-8d66d39e384d"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[연락처]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="340" y="103" width="75" height="17" uuid="d46b9164-a326-4a79-834c-88c9821499fd"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[배송요청일시]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="340" y="153" width="50" height="17" uuid="e85a11e7-5472-4bca-8701-0b74222d6b99"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[사은품]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="252" width="200" height="27" uuid="416dc27c-fb3d-4627-81f7-c40c56c47418"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="17" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[주문상품 및 결품/대체]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="84" y="137" width="81" height="17" uuid="11fd1d1c-3a85-4886-a0a2-3ad9e2e3d20f"/>
+				<textElement>
+					<font size="8" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{order_customer_name}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="227" y="104" width="112" height="17" uuid="cab440f4-2433-4173-ac68-41f3bd0addd0"/>
+				<textElement>
+					<font size="11" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{org_order_no}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="415" y="103" width="140" height="17" uuid="24a7d65d-fa97-4f46-9c01-718814919294"/>
+				<textElement textAlignment="Center">
+					<font size="11" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{order_date}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="84" y="105" width="81" height="17" uuid="568fb5f9-9772-4766-9fae-63db20c0b31f"/>
+				<textElement>
+					<font size="8" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{customer_name}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="227" y="153" width="112" height="17" uuid="f17d06e8-e9fe-4901-8d87-913968a3c1db"/>
+				<textElement>
+					<font size="11" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{tel_no_1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="227" y="136" width="112" height="17" uuid="78a1720b-59eb-43a7-87d3-cdef0aa806e8"/>
+				<textElement>
+					<font size="11" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{tel_no_2}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="84" y="170" width="465" height="30" uuid="66527a97-411e-4636-b141-c7334ebc269a"/>
+				<textElement>
+					<font size="10" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{address}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="85" y="200" width="465" height="27" uuid="bd5c938e-d6c5-422f-84a6-c76831ea4f2d"/>
+				<textElement>
+					<font size="9" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{delivery_message}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="391" y="153" width="50" height="17" uuid="915aef9b-3980-4162-8bd1-dcf072f6c458"/>
+				<textElement>
+					<font size="11" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{free_gift_name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="475" y="279" width="43" height="47" uuid="f0dbe524-871f-42b8-acdf-2e52892101a5"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[대체]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="279" width="35" height="47" uuid="77c1a4ce-5a1a-4b45-bb67-93f544361a04"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[순번]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="35" y="279" width="316" height="47" uuid="7e4aba4e-ee55-4c38-8917-c480c48f41ca"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[상품명
+(옵션/규격/제조원)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="404" y="279" width="35" height="47" uuid="96518119-f6c4-4034-a21c-1adba11d9420"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[주문
+수량]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="518" y="279" width="36" height="47" forecolor="#000000" backcolor="#FFFFFF" uuid="6ec3b013-60d9-46e0-86ee-5fde07941cdb"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[배송]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="439" y="279" width="36" height="47" uuid="c28e587c-3fa5-4f0d-83ca-b43fe752eab1"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[결품]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="51" width="555" height="1" uuid="8ed329b2-6b85-4317-9c60-76a2f83ef80a"/>
+			</line>
+			<image scaleImage="FillFrame" isUsingCache="false" isLazy="true" onErrorType="Blank">
+				<reportElement x="28" y="0" width="120" height="30" uuid="9ba92db6-5783-4b5a-89a8-62b71617c2b2"/>
+				<imageExpression><![CDATA["C:\\vertexid\\banner\\ehanaromart.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="340" y="136" width="50" height="17" uuid="80406292-6194-4125-bf4b-cfcdc10b9355"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[배송비]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="441" y="136" width="50" height="17" uuid="2d0a158f-5767-45a8-960f-198e6fe86b5d"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[대체여부]]></text>
+			</staticText>
+			<line>
+				<reportElement x="441" y="24" width="1" height="23" uuid="68d1e60a-9448-47d4-a579-6f156f0befe1"/>
+				<graphicElement>
+					<pen lineWidth="1.5"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="391" y="136" width="50" height="17" uuid="425fc24e-dbde-4734-b08b-f91162adc737"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{delivery_amount}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="492" y="136" width="50" height="17" uuid="6e5b469b-7341-4791-84bf-a9ae25aa6efb"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{change_allow_yn}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="35" y="29" width="100" height="20" uuid="8ed4e729-97fc-44d5-af7d-97078ebc2664"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[ehanaro.com]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="339" y="62" width="68" height="20" uuid="db7bc49d-de99-42dc-90a2-0527878dc202"/>
+				<textElement>
+					<font size="14" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[[상온/대 :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="436" y="62" width="75" height="20" uuid="8c947411-ae00-4309-bf54-b74655cceba6"/>
+				<textElement>
+					<font size="14" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[냉장/냉동 :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="540" y="62" width="10" height="20" uuid="3d18fd09-d611-4aab-ad5d-b92b45563c47"/>
+				<textElement textAlignment="Right">
+					<font size="14" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[]]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="351" y="279" width="53" height="47" forecolor="#000000" backcolor="#FFFFFF" uuid="66098958-c99f-4513-b7a4-a832b4f377d2"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[행사명]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="84" y="227" width="465" height="24" uuid="0574e664-21b1-4e0d-b954-8d344c8a9652"/>
+				<textElement>
+					<font size="9" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{goods_message}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="227" width="74" height="16" uuid="8ebc43f0-90d7-4aea-9232-3f8de0b150be"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[상품메시지]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="111" y="62" width="120" height="32" uuid="e2aad9a7-161b-4016-b90c-079ce28dde65"/>
+				<textElement>
+					<font size="16" isBold="true" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["("+ $P{delivery_count} + "차" + ")"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="402" y="24" width="1" height="23" uuid="97fe243d-5f50-46ac-8ac4-a2e37b1837f4"/>
+				<graphicElement>
+					<pen lineWidth="1.5"/>
+				</graphicElement>
+			</line>
+		</band>
+	</title>
+	<detail>
+		<band height="38" splitType="Immediate">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="rowcolor" mode="Opaque" x="35" y="0" width="316" height="37" uuid="168c327f-1912-4e30-8248-edae368aad3a"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="10" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph leftIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{상품명}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="rowcolor" mode="Opaque" x="404" y="0" width="35" height="37" uuid="24842b5c-28c5-4beb-8257-1d5076c6f86b"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{주문수량}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="rowcolor" mode="Opaque" x="475" y="0" width="43" height="37" uuid="56a7a9c8-b89a-43d6-b4f0-065a29ce434a"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{대체수량}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="rowcolor" mode="Opaque" x="439" y="0" width="36" height="37" uuid="be8456cd-e7fb-427b-8231-63d2aa091bce"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="15" isBold="true" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{결품}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="rowcolor" mode="Opaque" x="518" y="0" width="36" height="37" uuid="ad666f14-0834-4829-8fbd-44bdebd46d5e"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="15" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{배송}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement style="cellcolor" mode="Opaque" x="0" y="0" width="35" height="37" uuid="abb2082e-f88f-42c8-aeaf-ac8acf863a89"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="8" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{순번}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="rowcolor" mode="Opaque" x="351" y="0" width="53" height="37" uuid="d1c6d8be-a9d7-40ef-a86e-d78aae8ba27d"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					<paragraph rightIndent="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{프로모션명}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="23" splitType="Immediate">
+			<textField>
+				<reportElement x="244" y="0" width="30" height="20" uuid="10a76f88-df91-4bc9-8702-51282c0556ce"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER} + " /"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="277" y="0" width="26" height="20" uuid="88eb59cd-986a-497f-80da-a2715296bc6c"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="667" splitType="Immediate">
+			<image scaleImage="FillFrame" isUsingCache="false" isLazy="true" onErrorType="Blank">
+				<reportElement mode="Transparent" x="396" y="429" width="159" height="30" isRemoveLineWhenBlank="true" uuid="6813bf24-4e26-4017-8645-b7f3610a5fe8"/>
+				<imageExpression><![CDATA["C:\\vertexid\\banner\\banner_3.png"]]></imageExpression>
+			</image>
+			<elementGroup>
+				<staticText>
+					<reportElement mode="Transparent" x="0" y="0" width="35" height="37" isPrintInFirstWholeBand="true" uuid="001d4ddb-35d3-4704-ac0f-e9091869c5ae"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="11" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[합계]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="35" y="0" width="316" height="37" isPrintInFirstWholeBand="true" uuid="21edfebd-36b1-4bb6-b487-813f1d52aa94"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="11" isBold="true" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[-]]></text>
+				</staticText>
+				<textField isBlankWhenNull="true">
+					<reportElement x="404" y="0" width="35" height="37" isPrintInFirstWholeBand="true" uuid="e75fee05-2604-4301-938c-1fed80230fad"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+						<paragraph rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{order_qty_sum}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="439" y="0" width="36" height="37" isPrintInFirstWholeBand="true" uuid="89898dfc-4e42-4028-977f-96ee388e1a35"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="15" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+						<paragraph rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{sold_out_qty_sum}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="475" y="0" width="43" height="37" isPrintInFirstWholeBand="true" uuid="b8825e39-acf0-48ab-b94c-da755bed7cde"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+						<paragraph rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{change_pick_qty_sum}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement mode="Transparent" x="518" y="0" width="36" height="37" isPrintInFirstWholeBand="true" backcolor="#FFFFFF" uuid="22e28489-33d5-41c7-9c8b-daa12a2fc47b"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="15" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+						<paragraph rightIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{pick_qty_sum}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="351" y="0" width="53" height="37" isPrintInFirstWholeBand="true" uuid="db9da31c-a78f-402a-87a2-8c101db63c3f"/>
+					<box>
+						<topPen lineWidth="0.25"/>
+						<leftPen lineWidth="0.25"/>
+						<bottomPen lineWidth="0.25"/>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="11" isBold="true" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[-]]></text>
+				</staticText>
+			</elementGroup>
+			<elementGroup>
+				<elementGroup>
+					<staticText>
+						<reportElement positionType="FixRelativeToBottom" isPrintRepeatedValues="false" mode="Transparent" x="0" y="160" width="555" height="179" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF" uuid="1ee3362b-a31d-41cd-a363-c207db727baa"/>
+						<box>
+							<pen lineWidth="0.25"/>
+							<topPen lineWidth="1.5"/>
+							<leftPen lineWidth="1.5"/>
+							<bottomPen lineWidth="1.5"/>
+							<rightPen lineWidth="1.5"/>
+						</box>
+						<textElement verticalAlignment="Middle">
+							<font size="9" isBold="true" isUnderline="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+						</textElement>
+						<text><![CDATA[  ■ 본 주문확인서는 고객님의 e-하나로마트 주문에 대한 배송 처리 내역이며, 영수증 용도로는 사용하실 수 없습니다.
+
+  ■ 결제내역 및 결품(대체)/교환/반품 등은 농협몰∙e-하나로마트(PC/모바일)에서 주문자 본인이 확인하실 수 있습니다.
+
+  ■ 점포배송 상품은 실제 배송일과 차이로 인해 배송된 상품의 표시 가격(상품 라벨 가격 포함)이 다를 수 있으며,
+  일부 상품은 품절될 수 있습니다.
+
+  ■ 온라인 주문 후, 매장 행사(점포별 타임세일 등)로 인해 매장 상품의 가격이 인상 또는 인하되더라도
+  최초 온라인 주문금액을 기준으로 배송되며 이에 따른 차액의 추가 지불 또는 환불은 없습니다.
+
+  ■ 배송시점의 가격 인상 또는 인하가 발생하더라도 최초 주문 수량, 규격/중량은 변경되지 않습니다.
+
+  ■ 기타 e-하나로마트 쇼핑에 불편한 점이나 문의사항 등은 고객센터(1588-0028)로 연락주시기 바랍니다.]]></text>
+					</staticText>
+				</elementGroup>
+			</elementGroup>
+			<elementGroup>
+				<rectangle>
+					<reportElement positionType="FixRelativeToBottom" x="0" y="339" width="555" height="90" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="f316f78b-7812-4691-8420-4b81fd8e9168"/>
+					<graphicElement>
+						<pen lineWidth="1.5"/>
+					</graphicElement>
+				</rectangle>
+				<image scaleImage="FillFrame" isUsingCache="false" isLazy="true" onErrorType="Blank">
+					<reportElement positionType="FixRelativeToBottom" x="2" y="341" width="200" height="85" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="78264cd2-3b58-4212-a7e1-943d8023163b"/>
+					<box>
+						<rightPen lineWidth="0.25"/>
+					</box>
+					<imageExpression><![CDATA["C:\\vertexid\\banner\\banner_1.png"]]></imageExpression>
+				</image>
+				<staticText>
+					<reportElement positionType="FixRelativeToBottom" x="206" y="399" width="60" height="25" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="de407b1a-d3b4-472b-ad16-7ea4f79a4a9b"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None">
+						<font size="9" isBold="true" isUnderline="false" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[● 반품주소 : ]]></text>
+				</staticText>
+				<textField>
+					<reportElement positionType="FixRelativeToBottom" x="265" y="399" width="290" height="25" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="a74d686f-bf30-47bf-8ea2-bd6ef6c88a9d"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font size="9" isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{cancel_addr}]]></textFieldExpression>
+				</textField>
+			</elementGroup>
+			<elementGroup>
+				<rectangle>
+					<reportElement positionType="FixRelativeToBottom" mode="Opaque" x="0" y="88" width="555" height="71" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="eac4a58c-754f-4fd2-9d8e-59b0588933c3"/>
+					<graphicElement>
+						<pen lineWidth="1.5"/>
+					</graphicElement>
+				</rectangle>
+				<staticText>
+					<reportElement positionType="FixRelativeToBottom" x="10" y="95" width="60" height="17" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="7f60dcdb-b711-4703-82d9-b19c7f6fd773"/>
+					<textElement>
+						<font isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[주문처 :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="FixRelativeToBottom" x="70" y="95" width="157" height="17" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="40b1652c-4a42-44b3-a35f-81051d794cd6"/>
+					<textElement>
+						<font isBold="true" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[(주)농협하나로유통 온라인본부]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="FixRelativeToBottom" x="9" y="127" width="60" height="17" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="cb79602f-3e30-461f-8125-7ae8da809fd6"/>
+					<textElement>
+						<font isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[주소 :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="FixRelativeToBottom" x="69" y="127" width="234" height="17" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="1bca0769-5105-45c3-8af7-b93d3a56ad77"/>
+					<textElement>
+						<font isBold="true" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[서울특별시 마포구 신촌로 66]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="FixRelativeToBottom" x="403" y="127" width="130" height="17" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="42899dd3-bb9a-4360-a463-f037bdfc5ae3"/>
+					<textElement>
+						<font isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[1588-0028]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="FixRelativeToBottom" x="330" y="96" width="66" height="17" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="e73ed64c-6a1e-471e-8792-a3f405df67e6"/>
+					<textElement>
+						<font isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[사업자번호 :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="FixRelativeToBottom" x="406" y="96" width="130" height="17" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="3c0424e9-84f7-4e08-b6a8-59322405169c"/>
+					<textElement>
+						<font isBold="true" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[679-85-00934]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="FixRelativeToBottom" x="330" y="127" width="59" height="17" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true" uuid="17623bb3-2b10-4e2a-8459-9a3188e1c7ec"/>
+					<textElement>
+						<font isBold="true" pdfFontName="NanumGothicBold.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[고객센터 :]]></text>
+				</staticText>
+			</elementGroup>
+			<staticText>
+				<reportElement x="0" y="36" width="101" height="20" isPrintInFirstWholeBand="true" uuid="fdeff665-0981-4a8f-a5b9-17a47bc22e7b"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="true" pdfFontName="NanumGothic.ttf" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[ * : 면세, # : 영세]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>
